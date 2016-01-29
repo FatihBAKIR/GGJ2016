@@ -3,5 +3,15 @@ using UnityEngine;
 
 public class TileInfo
 {
-    private Material Material { get; set; }
+    public Material Material { get; private set; }
+
+    public TileInfo(Material mat)
+    {
+        Material = mat;
+    }
+}
+
+public class AgentInfo
+{
+    public GameObject Prefab;
 }

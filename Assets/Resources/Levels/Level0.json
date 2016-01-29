@@ -18,6 +18,13 @@
 		}
 	],
 
+	"agentinfo":
+	[
+		{
+			"prefab": "Trap"
+		}
+	],
+
 	"tiles":
 	[
 		{
@@ -32,13 +39,26 @@
 		},
 		{
 			"coord": [0, 1],
-			"tileinfo": 0,
+			"tileinfo": 1,
 			"elevate": 0
 		},
 		{
 			"coord": [1, 1],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [0, 3],
 			"tileinfo": 1,
 			"elevate": 0
+		}
+	],
+
+	"agents":
+	[
+		{
+			"coord": [0, 0],
+			"id": 0
 		}
 	]
 }
