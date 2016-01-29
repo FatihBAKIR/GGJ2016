@@ -48,8 +48,10 @@ class LevelLoader
 
     public static Level LoadLevel(string level)
     {
-        string file = Resources.Load<TextAsset>(level).text;
-        var info = JsonConvert.DeserializeObject<LevelInfo>(file);
+        string filename = string.Format("Levels/{0}.json", level);
+
+        string contents = Resources.Load<TextAsset>(filename).text;
+        var info = JsonConvert.DeserializeObject<LevelInfo>(contents);
 
         return null;
     }
