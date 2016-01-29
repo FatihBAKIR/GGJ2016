@@ -1,0 +1,44 @@
+{
+	"meta":
+	{
+		"width": 16,
+		"height": 16
+	},
+
+	"tileinfo":
+	[
+		{
+			"material": "RedTile"
+		},
+		{
+			"material": "BlueTile"
+		},
+		{
+			"material": "GreenTile"
+		}
+	],
+
+	"tiles":
+	[
+		{
+			"coord": [0, 0],
+			"tileinfo": 2,
+			"elevate": 0
+		},
+		{
+			"coord": [1, 0],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [0, 1],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [1, 1],
+			"tileinfo": 1,
+			"elevate": 0
+		}
+	]
+}
