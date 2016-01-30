@@ -22,6 +22,12 @@
 	[
 		{
 			"prefab": "Trap"
+		},
+		{
+			"prefab": "Player"
+		},
+		{
+			"prefab": "LerpAgent"
 		}
 	],
 
@@ -58,7 +64,11 @@
 	[
 		{
 			"coord": [0, 0],
-			"id": 0
+			"id": 2
+		},
+		{
+			"coord": [1, 1],
+			"id": 1
 		}
 	]
 }
