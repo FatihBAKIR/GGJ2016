@@ -6,6 +6,7 @@ public class LerpAgent : Agent
 {
     public int Sight;
     readonly WalkCommand _cmd = new WalkCommand();
+
     void Start()
     {
         _cmd.SetSource(this);

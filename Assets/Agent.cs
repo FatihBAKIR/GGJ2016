@@ -7,23 +7,16 @@ public abstract class Agent : MonoBehaviour
     private Coord _coord;
     public int Wait { get; set; }
 
-    private Grid Grid
-    {
-        get
-        {
-            return Level.CurrentLevel.Grid;
-        }
-    }
     public Coord Position
     {
         get
         {
             return _coord;
         }
-        set 
-        { 
+        set
+        {
             _coord = value;
-            transform.position = Grid.CoordSurfacePosition(_coord);
+            transform.position = Level.CurrentLevel.Grid.CoordSurfacePosition(_coord);
         }
     }
 
@@ -32,6 +25,11 @@ public abstract class Agent : MonoBehaviour
         Wait = Math.Max(0, Wait - 1);
 
         DoStep();
+    }
+
+    void Update()
+    {
+        GetComponent<Renderer>().enabled = Level.CurrentLevel.GetSeeState(Position) > (int)SeeState.Explored;
     }
 
     protected abstract void DoStep();

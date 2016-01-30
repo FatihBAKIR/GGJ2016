@@ -10,13 +10,21 @@ public class Loader : MonoBehaviour
     void Awake()
     {
         var level = LevelLoader.LoadLevel("Level0");
+        level.LevelLoaded += LevelOnLevelLoaded;
         level.LoadToScene();
 
         _keys = new Dictionary<KeyCode, Action>
         {
             { KeyCode.A, SummonTrap },
             { KeyCode.M, MovePlayer },
+            { KeyCode.N, Level.CurrentLevel.NextTurn }
         };
+    }
+
+    private void LevelOnLevelLoaded()
+    {
+        Level.CurrentLevel.SightResolveComplete += CurrentLevelOnSightResolveComplete;
+        Level.CurrentLevel.ResolveSight();
     }
 
     private TileCommand _currentTile = null;
@@ -41,9 +49,24 @@ public class Loader : MonoBehaviour
         {
             var tiles = Level.CurrentLevel.Get(src.Position, cmd.Range);
             _possibleTiles = tiles.Where(tile => cmd.CanApply(tile.Coordinate)).ToArray();
-            foreach (var tile in tiles)
+
+            foreach (var tile in _possibleTiles)
             {
-                
+                Debug.Log(tile.Coordinate);
+                Vector3 topCenter = Level.CurrentLevel.Grid.CoordSurfacePosition(tile.Coordinate);
+                Vector3 dir = Camera.main.transform.position - topCenter;
+
+                Ray r = new Ray(topCenter, dir);
+
+                foreach (var hit in Physics.RaycastAll(r))
+                {
+                    if (hit.transform.gameObject.GetComponent<TileWorks>() == null)
+                    {
+                        continue;
+                    }
+                    Debug.Log(string.Format("Tile at {0} blocks movement to {1}", Grid.PositionToCoord(hit.transform.position), tile.Coordinate));
+                    hit.transform.gameObject.GetComponent<TileWorks>().FadeOut();
+                }
             }
         }
 
@@ -52,6 +75,26 @@ public class Loader : MonoBehaviour
 
     private void CmdOnCommandComplete(Command command)
     {
+        Level.CurrentLevel.SightResolveComplete += CurrentLevelOnSightResolveComplete;
+        Level.CurrentLevel.ResolveSight();
+
+        if (command is WalkCommand)
+        {
+            foreach (var tile in FindObjectsOfType<TileWorks>())
+            {
+                tile.FadeIn();
+            }
+        }
+    }
+
+    private bool _first = true;
+    private void CurrentLevelOnSightResolveComplete()
+    {
+        if (_first)
+        {
+            _first = false;
+            return;
+        }
         Level.CurrentLevel.NextTurn();
     }
 

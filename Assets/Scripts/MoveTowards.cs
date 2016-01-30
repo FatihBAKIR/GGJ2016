@@ -21,7 +21,7 @@ public class MoveTowards : MonoBehaviour
 
         transform.position = Vector3.Lerp(Level.CurrentLevel.Grid.CoordSurfacePosition(GetComponent<Agent>().Position), Level.CurrentLevel.Grid.CoordSurfacePosition(_movingTo), _t);
 
-        _t += Time.deltaTime;
+        _t += Time.deltaTime * 2;
 
         if (_t < 1) return;
 

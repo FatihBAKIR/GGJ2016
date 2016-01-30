@@ -14,7 +14,7 @@ public class Tile
     {
         get
         {
-            return Grid.CoordToPosition(Coordinate) + (Elevation + 0.5f) * Vector3.up;
+            return Level.CurrentLevel.Grid.CoordToPosition(Coordinate) + (Elevation + 0.5f) * Vector3.up;
         }
     }
 
@@ -55,7 +55,7 @@ public class Grid
         return new Coord((int)pos.x, (int)pos.z);
     }
 
-    public static Vector3 CoordToPosition(Coord crd)
+    public Vector3 CoordToPosition(Coord crd)
     {
         return new Vector3(crd.X, 0, crd.Y);
     }
@@ -83,7 +83,7 @@ public class Grid
     public Tile[] GetLoS(int x, int y, int radius)
     {
         List<Tile> losTiles = new List<Tile>();
-        
+
         for (int i = -radius; i < radius + 1; i++)
         {
             for (int j = -(radius - Math.Abs(i)); j < 1 + (radius - Math.Abs(i)); j++)
@@ -120,9 +120,22 @@ public class Grid
     }
 }
 
+public enum SeeState
+{
+    Hidden = 0,
+    Explored = 1,
+    Ascending = 2,
+    Revealed = 4
+}
+
 public class Level
 {
+    public event Action SightResolveComplete = delegate { };
+    public event Action LevelLoaded = delegate { }; 
+
     private readonly Grid _grid;
+
+    private readonly SeeState[,] _canSee;
 
     public Grid Grid
     {
@@ -150,6 +163,12 @@ public class Level
         _agentMap = agentMap;
 
         _agents = new List<Agent>();
+        _canSee = new SeeState[Grid.Width, Grid.Height];
+    }
+
+    public Tile PlayerTile
+    {
+        get { return Get(Grid.PositionToCoord(Object.FindObjectOfType<Player>().transform.position)); }
     }
 
     public Tile Get(Coord c)
@@ -177,6 +196,11 @@ public class Level
         return _grid.GetLoS(c.X, c.Y, r);
     }
 
+    public int GetSeeState(Coord c)
+    {
+        return (int)_canSee[c.X, c.Y];
+    }
+
     public void LoadToScene()
     {
         if (CurrentLevel != null)
@@ -186,7 +210,7 @@ public class Level
         }
         _level = this;
 
-        GameObject tilePref = Resources.Load<GameObject>("Tile");
+        GameObject tilePref = Resources.Load<GameObject>("Tile"); 
         tilePref.GetComponent<MeshFilter>().sharedMesh = CubeGen.TileCube;
 
         for (int i = 0; i < _grid.Height; i++)
@@ -197,17 +221,32 @@ public class Level
                 {
                     continue;
                 }
-                var go = Object.Instantiate(tilePref, Grid.CoordToPosition(_grid.Get(j, i).Coordinate) + _grid.Get(j, i).Elevation * Vector3.up, Quaternion.identity) as GameObject;
+                var go = Object.Instantiate(tilePref, Grid.CoordToPosition(_grid.Get(j, i).Coordinate) + (_grid.Get(j, i).Elevation - 10) * Vector3.up, Quaternion.identity) as GameObject;
                 go.GetComponent<Renderer>().material = _grid.Get(j, i).Info.Material;
-                _grid.Get(j, i).Obj = go;
+                go.GetComponent<Renderer>().material.color = Color.black;
+                Grid.Get(j, i).Obj = go;
+                go.GetComponent<TileWorks>().SetState(Grid.Get(i, j), _canSee[i, j]);
+                go.GetComponent<TileWorks>().StateChangeComplete += OnAscendComplete;
             }
         }
 
         foreach (var initializer in _initializers)
         {
-            _agents.Add(initializer());
+            var agent = initializer();
+            agent.GetComponent<Renderer>().enabled = false;
+            _agents.Add(agent);
         }
 
+        LevelLoaded();
+    }
+
+    private int _waitingFor = 0;
+    private void OnAscendComplete(Tile tile)
+    {
+        if (--_waitingFor == 0)
+        {
+            SightResolveComplete();
+        }
     }
 
     public void Clear()
@@ -218,6 +257,42 @@ public class Level
     public void Destroy(Agent a)
     {
         _delete[_agents.IndexOf(a)] = true;
+    }
+
+    public void ResolveSight()
+    {
+        var tilesSeen = GetLoS(Object.FindObjectOfType<Player>().Position, 2);
+        foreach (var tile in tilesSeen)
+        {
+            if (tile == null)
+                continue;
+
+            Reveal(tile.Coordinate);
+        }
+
+        for (int j = 0; j < Grid.Height; j++)
+        {
+            for (int i = 0; i < Grid.Width; i++)
+            {
+                if (Grid.Get(i, j) == null)
+                    continue;
+
+                if (Grid.Get(i, j).Obj.GetComponent<TileWorks>().SetState(Grid.Get(i, j), _canSee[i, j]))
+                {
+                    _waitingFor++;                    
+                }
+
+                if (_canSee[i, j] > SeeState.Explored)
+                {
+                    _canSee[i, j]--;
+                }
+            }
+        }
+
+        if (_waitingFor == 0)
+        {
+            SightResolveComplete();
+        }
     }
 
     bool[] _delete;
@@ -258,5 +333,17 @@ public class Level
         var go = Object.Instantiate(_initialAgents[AgentIdByName(name)].Prefab, _grid.CoordSurfacePosition(coord), Quaternion.identity) as GameObject;
         _agents.Add(go.GetComponent<Agent>());
         return go.GetComponent<Agent>();
+    }
+
+    public void Reveal(Coord tile)
+    {
+        if (_canSee[tile.X, tile.Y] == SeeState.Hidden)
+        {
+            _canSee[tile.X, tile.Y] = SeeState.Ascending;
+        }
+        else
+        {
+            _canSee[tile.X, tile.Y] = SeeState.Revealed;
+        }
     }
 }

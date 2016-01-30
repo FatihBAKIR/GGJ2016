@@ -8,17 +8,17 @@
 	"tileinfo":
 	[
 		{
-			"material": "RedTile"
+			"material": "StoneTile"
 		},
 		{
-			"material": "BlueTile"
-		},
-		{
-			"material": "GreenTile"
+			"material": "SandTile"
 		},
 		{
 			"material": "GrassTile"
-		}
+		},
+		{
+			"material": "RedTile"
+		},
 	],
 
 	"agentinfo":
@@ -38,38 +38,73 @@
 	[
 		{
 			"coord": [0, 0],
-			"tileinfo": 3,
+			"tileinfo": 1,
 			"elevate": 0
 		},
 		{
 			"coord": [1, 0],
-			"tileinfo": 3,
+			"tileinfo": 2,
 			"elevate": 0
 		},
 		{
 			"coord": [0, 1],
-			"tileinfo": 3,
+			"tileinfo": 2,
 			"elevate": 0
 		},
 		{
 			"coord": [1, 1],
-			"tileinfo": 3,
+			"tileinfo": 2,
 			"elevate": 0
 		},
 		{
 			"coord": [1, 2],
-			"tileinfo": 3,
+			"tileinfo": 0,
 			"elevate": 0
 		},
 		{
 			"coord": [1, 3],
-			"tileinfo": 3,
+			"tileinfo": 0,
 			"elevate": 0
 		},
 		{
 			"coord": [0, 3],
-			"tileinfo": 3,
+			"tileinfo": 0,
 			"elevate": 0
+		},
+		{
+			"coord": [2, 3],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [3, 3],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [3, 2],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [3, 1],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [3, 0],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [2, 0],
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [2, 1],
+			"tileinfo": 2,
+			"elevate": 1
 		}
 	],
 
