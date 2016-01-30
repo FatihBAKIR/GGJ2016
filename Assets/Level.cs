@@ -14,7 +14,7 @@ public class Tile
     {
         get
         {
-            return Level.CurrentLevel.Grid.CoordToPosition(Coordinate) + (Elevation + 0.5f) * Vector3.up;
+            return Grid.CoordToPosition(Coordinate) + (Elevation + 0.5f) * Vector3.up;
         }
     }
 
@@ -55,7 +55,7 @@ public class Grid
         return new Coord((int)pos.x, (int)pos.z);
     }
 
-    public Vector3 CoordToPosition(Coord crd)
+    public static Vector3 CoordToPosition(Coord crd)
     {
         return new Vector3(crd.X, 0, crd.Y);
     }

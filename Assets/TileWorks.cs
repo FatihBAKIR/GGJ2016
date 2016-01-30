@@ -67,7 +67,7 @@ public class TileWorks : MonoBehaviour
     {
         _state = ChangeState.Ascending;
         _t = 0;
-        _to = Level.CurrentLevel.Grid.CoordToPosition(_tile.Coordinate) + (_tile.Elevation * Vector3.up);
+        _to = Grid.CoordToPosition(_tile.Coordinate) + (_tile.Elevation * Vector3.up);
         _from = transform.position;
 
         _colorFrom = GetComponent<Renderer>().material.color;
