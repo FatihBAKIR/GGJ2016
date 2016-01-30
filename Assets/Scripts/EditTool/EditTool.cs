@@ -48,6 +48,7 @@ public class EditTool : MonoBehaviour
     void Awake()
     {
         _tilePref = Resources.Load<GameObject>("Tile");
+        _tilePref.GetComponent<MeshFilter>().sharedMesh = CubeGen.TileCube;
     }
 
     public void SetTileMode(bool mode)
