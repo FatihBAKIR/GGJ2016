@@ -82,8 +82,6 @@ class LevelLoader
         TileInfo[] tinfos = new TileInfo[info.TileInfos.Length];
         AgentInfo[] agents = new AgentInfo[info.AgentInfos.Length];
 
-        Debug.Log(info.AgentInfos.Length);
-
         Dictionary<string, int> agentmap = new Dictionary<string, int>();
 
         for (int i = 0; i < info.TileInfos.Length; i++)
