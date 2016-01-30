@@ -26,6 +26,11 @@ public struct Coord
         return new Coord(lhs.X + rhs.X, lhs.Y + rhs.Y);
     }
 
+    public static Coord operator -(Coord lhs, Coord rhs)
+    {
+        return new Coord(lhs.X - rhs.X, lhs.Y - rhs.Y);
+    }
+
     public static float Distance(Coord lhs, Coord rhs)
     {
         return Vector2.Distance(new Vector2(lhs.X, lhs.Y), new Vector2(rhs.X, rhs.Y));

@@ -11,6 +11,7 @@ GameObject:
   - 33: {fileID: 3359762}
   - 23: {fileID: 2337464}
   - 114: {fileID: 11460192}
+  - 95: {fileID: 9518748}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -102,6 +103,23 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 116904}
   m_Mesh: {fileID: 0}
+--- !u!95 &9518748
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 116904}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 480c184208ebd34468799ba5830d1668, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &11405970
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -176,6 +194,10 @@ Prefab:
       propertyPath: m_LocalRotation.w
       value: -0.25881928
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 480c184208ebd34468799ba5830d1668, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 122250}

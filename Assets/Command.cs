@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 abstract class Command
 {
@@ -78,6 +79,38 @@ sealed class SpawnCommand : TileCommand
 
 sealed class WalkCommand : TileCommand
 {
+    enum Dir
+    {
+        PosX,
+        PosZ,
+        NegX,
+        NegZ
+    }
+
+    Dir GetDir(Coord target)
+    {
+        Coord move = target - Source.Position;
+
+        if (move == new Coord(1, 0))
+        {
+            return Dir.PosX;
+        }
+        if (move == new Coord(0, 1))
+        {
+            return Dir.PosZ;
+        }
+        if (move == new Coord(-1, 0))
+        {
+            return Dir.NegX;
+        }
+        if (move == new Coord(0, -1))
+        {
+            return Dir.NegZ;
+        }
+
+        throw new Exception("Never going to happen");
+    }
+
     public override int Range
     {
         get { return 1; }
@@ -95,11 +128,31 @@ sealed class WalkCommand : TileCommand
     {
         Source.GetComponent<MoveTowards>().MoveComplete += OnMoveComplete;
         Source.GetComponent<MoveTowards>().SetTarget(tile);
+
+        Debug.Log(GetDir(tile));
+        switch (GetDir(tile))
+        {
+            case Dir.PosX:
+                Source.GetComponentInChildren<SkeletonAnimation>().transform.eulerAngles = new Vector3(0, 30, 0);
+                break;
+            case Dir.PosZ:
+                Source.GetComponentInChildren<SkeletonAnimation>().transform.eulerAngles = new Vector3(0, 240, 0);
+                break;
+            case Dir.NegX:
+                Source.GetComponentInChildren<SkeletonAnimation>().transform.eulerAngles = new Vector3(0, 210, 0);
+                break;
+            case Dir.NegZ:
+                Source.GetComponentInChildren<SkeletonAnimation>().transform.eulerAngles = new Vector3(0, 60, 0);
+                break;
+        }
+
+        Source.GetComponentInChildren<SkeletonAnimation>().AnimationName = "walking";
     }
 
     private void OnMoveComplete(MoveTowards moveTowards)
     {
         Completed();
+        Source.GetComponentInChildren<SkeletonAnimation>().AnimationName = "idle";
         Source.GetComponent<MoveTowards>().MoveComplete -= OnMoveComplete;
     }
 }
