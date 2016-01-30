@@ -44,12 +44,12 @@ public class Grid
         Height = h;
     }
 
-    public Coord PositionToCoord(Vector3 pos)
+    public static Coord PositionToCoord(Vector3 pos)
     {
         throw new NotImplementedException();
     }
 
-    public Vector3 CoordToPosition(Coord crd)
+    public static Vector3 CoordToPosition(Coord crd)
     {
         return new Vector3(crd.X, 0, crd.Y);
     }
@@ -74,14 +74,16 @@ public class Level
 {
     private readonly Grid _grid;
 
-    private readonly List<Agent> Agents;
+    private readonly List<Agent> _agents;
 
     private readonly TileInfo[] _initialTiles;
     private readonly AgentInfo[] _initialAgents;
 
-    private Func<Agent>[] _initializers;
+    private readonly Dictionary<string, int> _agentMap; 
 
-    public Level(Grid g, AgentInfo[] agents, TileInfo[] tiles, Func<Agent>[] agentInitializers)
+    private readonly Func<Agent>[] _initializers;
+
+    public Level(Grid g, AgentInfo[] agents, TileInfo[] tiles, Func<Agent>[] agentInitializers, Dictionary<string, int> agentMap)
     {
         _grid = g;
 
@@ -89,6 +91,10 @@ public class Level
         _initialTiles = tiles;
 
         _initializers = agentInitializers;
+
+        _agentMap = agentMap;
+
+        _agents = new List<Agent>();
     }
 
     public Tile Get(int x, int y)
@@ -119,14 +125,14 @@ public class Level
                 {
                     continue;
                 }
-                var go = Object.Instantiate(tilePref, _grid.CoordToPosition(_grid.Get(j, i).Coordinate), Quaternion.identity) as GameObject;
+                var go = Object.Instantiate(tilePref, Grid.CoordToPosition(_grid.Get(j, i).Coordinate), Quaternion.identity) as GameObject;
                 go.GetComponent<Renderer>().material = _grid.Get(j, i).Info.Material;
             }
         }
 
         foreach (var initializer in _initializers)
         {
-            initializer();
+            _agents.Add(initializer());
         }
 
         _level = this;
@@ -137,6 +143,31 @@ public class Level
         
     }
 
+    public void Destroy(Agent a)
+    {
+        _delete[_agents.IndexOf(a)] = true;
+    }
+
+    bool[] _delete;
+    public void NextTurn()
+    {
+        _delete = new bool[_agents.Count];
+
+        foreach (var agent in _agents)
+        {
+            agent.Step();
+        }
+
+        for (int i = _delete.Length - 1; i >= 0; i--)
+        {
+            if (_delete[i])
+            {
+                Object.Destroy(_agents[i].gameObject);
+                _agents.RemoveAt(i);
+            }
+        }
+    }
+
     static Level _level;
 
     public static Level CurrentLevel
@@ -144,8 +175,15 @@ public class Level
         get { return _level; }
     }
 
-    public Agent Instantiate(GameObject prefab, Coord coord)
+    public int AgentIdByName(string name)
     {
-        throw new NotImplementedException();
+        return _agentMap[name];
+    }
+
+    public Agent Instantiate(string name, Coord coord)
+    {
+        var go = Object.Instantiate(_initialAgents[AgentIdByName(name)].Prefab, Grid.CoordToPosition(coord), Quaternion.identity) as GameObject;
+        _agents.Add(go.GetComponent<Agent>());
+        return go.GetComponent<Agent>();
     }
 }

@@ -76,6 +76,8 @@ class LevelLoader
         TileInfo[] tinfos = new TileInfo[info.TileInfos.Length];
         AgentInfo[] agents = new AgentInfo[info.Agents.Length];
 
+        Dictionary<string, int> agentmap = new Dictionary<string, int>();
+
         for (int i = 0; i < info.TileInfos.Length; i++)
         {
             tinfos[i] = new TileInfo(Resources.Load<Material>(string.Format("Tiles/{0}", info.TileInfos[i].Mat)));
@@ -87,6 +89,8 @@ class LevelLoader
             {
                 Prefab = Resources.Load<GameObject>(string.Format("Agents/{0}", info.AgentInfos[i].Prefab))
             };
+
+            agentmap.Add(info.AgentInfos[i].Prefab, i);
         }
 
         Grid g = new Grid(info.Meta.Width, info.Meta.Height);
@@ -108,6 +112,6 @@ class LevelLoader
             };
         }
 
-        return new Level(g, agents, tinfos, agentCreators);
+        return new Level(g, agents, tinfos, agentCreators, agentmap);
     }
 }

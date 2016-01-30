@@ -1,5 +1,8 @@
-﻿class Command
+﻿using UnityEngine;
+
+abstract class Command
 {
+    protected int Cost = 1;
     protected Agent Source;
 
     public void SetSource(Agent src)
@@ -7,21 +10,50 @@
         Source = src;
     }
 
-    public virtual void Apply()
+    public void Apply()
+    {
+        Source.Wait += Cost;
+        DoApply();
+    }
+
+    protected virtual void DoApply()
     {
     }
 }
 
-class TileCommand : Command
+abstract class TileCommand : Command
 {
-    public virtual void Apply(Coord tile)
+    public void Apply(Coord tile)
     {
+        Source.Wait += Cost;
+        DoApply(tile);
     }
+
+    protected abstract void DoApply(Coord tile);
 }
 
-class AgentCommand : Command
+abstract class AgentCommand : Command
 {
-    public virtual void Apply(Agent agent)
+    public void Apply(Agent agent)
     {
+        Source.Wait += Cost;
+        DoApply(agent);
+    }
+
+    protected abstract void DoApply(Agent agent);
+}
+
+sealed class SpawnCommand : TileCommand
+{
+    private readonly string _name;
+
+    public SpawnCommand(string agentName)
+    {
+        _name = agentName;
+    }
+
+    protected override void DoApply(Coord tile)
+    {
+        Level.CurrentLevel.Instantiate(_name, tile);
     }
 }

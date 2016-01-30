@@ -1,12 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Trap : Agent
-{
-    public int Radius { get; private set; }
+public class Player : Agent {
 
     protected override void DoStep()
     {
-        Step();
     }
 }
