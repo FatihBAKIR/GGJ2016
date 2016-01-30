@@ -3,18 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class Coord
-{
-    public int X { get; private set; }
-    public int Y { get; private set; }
-
-    public Coord(int x, int y)
-    {
-        X = x;
-        Y = y;
-    }
-}
-
 public class Tile
 {
     public GameObject Obj { get; private set; }
@@ -46,7 +34,7 @@ public class Grid
 
     public static Coord PositionToCoord(Vector3 pos)
     {
-        throw new NotImplementedException();
+        return new Coord((int)pos.x, (int)pos.z);
     }
 
     public static Vector3 CoordToPosition(Coord crd)

@@ -74,7 +74,9 @@ class LevelLoader
         var info = JsonConvert.DeserializeObject<LevelInfo>(contents);
 
         TileInfo[] tinfos = new TileInfo[info.TileInfos.Length];
-        AgentInfo[] agents = new AgentInfo[info.Agents.Length];
+        AgentInfo[] agents = new AgentInfo[info.AgentInfos.Length];
+
+        Debug.Log(info.AgentInfos.Length);
 
         Dictionary<string, int> agentmap = new Dictionary<string, int>();
 

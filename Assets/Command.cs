@@ -57,3 +57,11 @@ sealed class SpawnCommand : TileCommand
         Level.CurrentLevel.Instantiate(_name, tile);
     }
 }
+
+sealed class WalkCommand : TileCommand
+{
+    protected override void DoApply(Coord tile)
+    {
+        Source.GetComponent<MoveTowards>().SetTarget(tile);
+    }
+}
