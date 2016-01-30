@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 public class EditTool : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class EditTool : MonoBehaviour
     public GameObject materialParent;
     public GameObject materialEntryPrefab;
     public GameObject materialText;
+    public Button saveButton;
+    public InputField filenameInput;
 
     private Material _currentMat;
     private GameObject _tilePref;
@@ -23,6 +26,8 @@ public class EditTool : MonoBehaviour
     private List<Tile> _tiles = new List<Tile>();
     private List<GameObject> _tileObjects = new List<GameObject>();
     private List<Agent> _agents = new List<Agent>();
+    private Dictionary<string, int> _tileInfoIDs = new Dictionary<string, int>();
+    private Dictionary<string, int> _agentInfoIDs = new Dictionary<string, int>();
     // Use this for initialization
 
     void Awake()
@@ -51,24 +56,35 @@ public class EditTool : MonoBehaviour
         levelInfo.Meta = new LevelLoader.LevelInfo.LevelMeta() { Width = 16, Height = 16 };
         levelInfo.TileInfos = new LevelLoader.LevelInfo.TilePrefInfo[materials.Length];
         levelInfo.AgentInfos = new LevelLoader.LevelInfo.AgentPrefInfo[agentsPrefabs.Length];
-        
-        for(int i = 0; i < materials.Length; i++)
+
+        for (int i = 0; i < materials.Length; i++)
         {
             levelInfo.TileInfos[i] = new LevelLoader.LevelInfo.TilePrefInfo() { Mat = materials[i].name };
+            _tileInfoIDs.Add(materials[i].name, i);
         }
 
-        for(int i = 0; i < agentsPrefabs.Length; i++)
+        for (int i = 0; i < agentsPrefabs.Length; i++)
         {
             levelInfo.AgentInfos[i] = new LevelLoader.LevelInfo.AgentPrefInfo() { Prefab = agentsPrefabs[i].name };
+            _agentInfoIDs.Add(agentsPrefabs[i].name, i);
         }
 
+        saveButton.onClick.AddListener(() => SaveFile(filenameInput.text));
         PopulateMaterials(materialParent);
     }
 
+    void SaveFile(string filename)
+    {
+        FileStream fs = new FileStream("./Assets/Resources/Levels/Level" + filename + ".json", FileMode.CreateNew);
+        StreamWriter sw = new StreamWriter(fs);
+        UpdateLevelInfo();
+        sw.Write(JsonConvert.SerializeObject(levelInfo));
+        sw.Close();
+    }
 
     void PopulateMaterials(GameObject materialsParent)
     {
-        foreach(var mat in materials)
+        foreach (var mat in materials)
         {
             Debug.LogWarning(mat.name);
             var button = GameObject.Instantiate(materialEntryPrefab) as GameObject;
@@ -77,6 +93,44 @@ public class EditTool : MonoBehaviour
             var m = mat;
             button.GetComponent<Button>().onClick.AddListener(() => SetMat(m));
         }
+    }
+    public static string ReplaceLastOccurrence(string Source, string Find, string Replace)
+    {
+        int place = Source.LastIndexOf(Find);
+
+        if (place == -1)
+            return Source;
+
+        string result = Source.Remove(place, Find.Length).Insert(place, Replace);
+        return result;
+    }
+
+    void UpdateLevelInfo()
+    {
+        levelInfo.Tiles = new LevelLoader.LevelInfo.TileInstanceInfo[_tiles.Count];
+        for (int i = 0; i < _tiles.Count; i++)
+        {
+            var t = _tiles[i];
+            levelInfo.Tiles[i] = new LevelLoader.LevelInfo.TileInstanceInfo()
+            {
+                Coord = new int[] { t.Coordinate.X, t.Coordinate.Y },
+                Elevation = t.Elevation,
+                InfoNo = _tileInfoIDs[t.Info.Material.name]
+            };
+        }
+
+        levelInfo.Agents = new LevelLoader.LevelInfo.AgentInstanceInfo[_agents.Count];
+        for (int i = 0; i < _agents.Count; i++)
+        {
+            var a = _agents[i];
+            levelInfo.Agents[i] = new LevelLoader.LevelInfo.AgentInstanceInfo()
+            {
+                Coords = new int[] { a.Position.X, a.Position.Y },
+                PrefId = _agentInfoIDs[ReplaceLastOccurrence(a.name, "(Clone", "")]
+            };
+        }
+
+        Debug.Log(JsonConvert.SerializeObject(levelInfo));
     }
 
     void SetMat(Material mat)
@@ -106,14 +160,14 @@ public class EditTool : MonoBehaviour
                                                                     onTile ? Color.red : Color.yellow, -1, true);
             }
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0))
             {
-                if(!onTile)
+                if (!onTile)
                     CreateTile(coord, _currentMat);
             }
-            if(Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButton(1))
             {
-                if(onTile)
+                if (onTile)
                 {
                     _tileObjects.Remove(select_tile.Obj);
                     Destroy(select_tile.Obj);
