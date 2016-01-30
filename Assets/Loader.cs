@@ -5,7 +5,7 @@ public class Loader : MonoBehaviour {
 
     void Awake()
     {
-        var level = LevelLoader.LoadLevel("Level0");
+        var level = LevelLoader.LoadLevel("Level1");
         level.LoadToScene();
     }
 }

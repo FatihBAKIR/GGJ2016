@@ -54,6 +54,11 @@ public class Grid
         return new Vector3(crd.X, 0, crd.Y);
     }
 
+    public Vector3 CoordToPosition(int x, int y)
+    {
+        return new Vector3(x, 0, y);
+    }
+
     public void Set(Tile t)
     {
         _tiles[t.Coordinate.X, t.Coordinate.Y] = t;
@@ -62,6 +67,27 @@ public class Grid
     public Tile Get(int x, int y)
     {
         return _tiles[x, y];
+    }
+
+    public List<Tile> GetLoS(int x, int y, int radius)
+    {
+        List<Tile> losTiles = new List<Tile>();
+        for (int i = -radius; i != radius; i++)
+        {
+            for (int j = -(radius - Math.Abs(i)); j != (radius - Math.Abs(i)); j++)
+            {
+                if (x + i < 0 || x + i > Width || y + j < 0 || y + j > Height) continue;
+
+                Vector3 origin = CoordToPosition(x, y) + (_tiles[x,y] == null ? 0 : _tiles[x,y].Elevation + 1) * Vector3.up;
+                Vector3 direction = CoordToPosition(x + i, y + j) + Vector3.up - origin;
+                float distance = direction.magnitude;
+                direction.Normalize();
+
+                if(!Physics.Raycast(origin , direction, distance, 1 << LayerMask.NameToLayer("Grid")))
+                    losTiles.Add(_tiles[x + i, y + j]);
+            }
+        }
+        return losTiles;
     }
 
     public Tile[] Get(int x, int y, int r)
@@ -119,7 +145,7 @@ public class Level
                 {
                     continue;
                 }
-                var go = Object.Instantiate(tilePref, _grid.CoordToPosition(_grid.Get(j, i).Coordinate), Quaternion.identity) as GameObject;
+                var go = Object.Instantiate(tilePref, _grid.CoordToPosition(_grid.Get(j, i).Coordinate) + _grid.Get(j,i).Elevation * Vector3.up, Quaternion.identity) as GameObject;
                 go.GetComponent<Renderer>().material = _grid.Get(j, i).Info.Material;
             }
         }
@@ -134,7 +160,7 @@ public class Level
 
     public void Clear()
     {
-        
+
     }
 
     static Level _level;

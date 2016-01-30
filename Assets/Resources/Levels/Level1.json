@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "width": 16,
+    "height": 16
+  },
+
+  "tileinfo": [
+    {
+      "material": "RedTile"
+    },
+    {
+      "material": "BlueTile"
+    },
+    {
+      "material": "GreenTile"
+    }
+  ],
+
+  "agentinfo": [
+    {
+      "prefab": "Trap"
+    }
+  ],
+
+  "tiles": [
+    {
+      "coord": [ 0, 0 ],
+      "tileinfo": 2,
+      "elevate": 0
+    },
+    {
+      "coord": [ 1, 0 ],
+      "tileinfo": 0,
+      "elevate": 0
+    },
+    {
+      "coord": [ 0, 1 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 1, 1 ],
+      "tileinfo": 0,
+      "elevate": 0
+    },
+    {
+      "coord": [ 0, 3 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 2, 0 ],
+      "tileinfo": 2,
+      "elevate": 0
+    },
+    {
+      "coord": [ 2, 1 ],
+      "tileinfo": 0,
+      "elevate": 0
+    },
+    {
+      "coord": [ 3, 0 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 3, 1 ],
+      "tileinfo": 0,
+      "elevate": 1
+    },
+    {
+      "coord": [ 4, 0 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 0, 2 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 1, 2 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 2, 2 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 3, 2 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 4, 2 ],
+      "tileinfo": 1,
+      "elevate": 0
+    },
+    {
+      "coord": [ 3, 3 ],
+      "tileinfo": 1,
+      "elevate": 0
+    }
+  ],
+
+  "agents": [
+    {
+      "coord": [ 0, 0 ],
+      "id": 0
+    }
+  ]
+}
