@@ -107,13 +107,15 @@ public class EditTool : MonoBehaviour
 
     void UpdateLevelInfo()
     {
+        var normX = - _tiles.Min((x) => x.Coordinate.X);
+        var normY = - _tiles.Min((x) => x.Coordinate.Y);
         levelInfo.Tiles = new LevelLoader.LevelInfo.TileInstanceInfo[_tiles.Count];
         for (int i = 0; i < _tiles.Count; i++)
         {
             var t = _tiles[i];
             levelInfo.Tiles[i] = new LevelLoader.LevelInfo.TileInstanceInfo()
             {
-                Coord = new int[] { t.Coordinate.X, t.Coordinate.Y },
+                Coord = new int[] { t.Coordinate.X + normX, t.Coordinate.Y + normY},
                 Elevation = t.Elevation,
                 InfoNo = _tileInfoIDs[t.Info.Material.name]
             };
@@ -125,7 +127,7 @@ public class EditTool : MonoBehaviour
             var a = _agents[i];
             levelInfo.Agents[i] = new LevelLoader.LevelInfo.AgentInstanceInfo()
             {
-                Coords = new int[] { a.Position.X, a.Position.Y },
+                Coords = new int[] { a.Position.X + normX, a.Position.Y + normY},
                 PrefId = _agentInfoIDs[ReplaceLastOccurrence(a.name, "(Clone", "")]
             };
         }
