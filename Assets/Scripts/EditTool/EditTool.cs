@@ -109,6 +109,14 @@ public class EditTool : MonoBehaviour
     {
         var normX = - _tiles.Min((x) => x.Coordinate.X);
         var normY = - _tiles.Min((x) => x.Coordinate.Y);
+
+        var maxX = - _tiles.Max((x) => x.Coordinate.X);
+        var maxY = - _tiles.Max((x) => x.Coordinate.Y);
+        var minX = - _tiles.Min((x) => x.Coordinate.X);
+        var minY = - _tiles.Min((x) => x.Coordinate.Y);
+
+        levelInfo.Meta.Height = maxY - minY;
+        levelInfo.Meta.Width = maxX - minX;
         levelInfo.Tiles = new LevelLoader.LevelInfo.TileInstanceInfo[_tiles.Count];
         for (int i = 0; i < _tiles.Count; i++)
         {
