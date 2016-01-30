@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class TileInfo
@@ -6,6 +7,7 @@ public class TileInfo
     public bool CanWalk { get; private set; }
     public Material Material { get; private set; }
 
+    [Obsolete("Use TileInfo(Material, bool) instead")]
     public TileInfo(Material mat) : this(mat, true)
     {
         
