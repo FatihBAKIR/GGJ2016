@@ -70,6 +70,11 @@ public class Grid
         return _tiles[crd.X, crd.Y].Position;
     }
 
+    public Vector3 CoordAgentCenterPosition(Coord crd)
+    {
+        return CoordSurfacePosition(crd) + 0.5f*Vector3.up;
+    }
+
     public void Set(Tile t)
     {
         _tiles[t.Coordinate.X, t.Coordinate.Y] = t;
@@ -131,7 +136,10 @@ public enum SeeState
 public class Level
 {
     public event Action SightResolveComplete = delegate { };
-    public event Action LevelLoaded = delegate { }; 
+    public event Action LevelLoaded = delegate { };
+
+    public event Action Failed = delegate { };
+    public event Action Success = delegate { }; 
 
     private readonly Grid _grid;
 
@@ -256,6 +264,7 @@ public class Level
 
     public void Destroy(Agent a)
     {
+        if (a == null) return;
         _delete[_agents.IndexOf(a)] = true;
     }
 
@@ -296,14 +305,18 @@ public class Level
     }
 
     bool[] _delete;
+    public int TurnCount { get; private set; }
     public void NextTurn()
     {
         _delete = new bool[_agents.Count];
+        TurnCount++;
 
+        Debug.Log("begin");
         foreach (var agent in _agents)
         {
             agent.Step();
         }
+        Debug.Log("end");
 
         for (int i = _delete.Length - 1; i >= 0; i--)
         {

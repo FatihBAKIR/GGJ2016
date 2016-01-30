@@ -43,11 +43,17 @@ class LevelLoader
 
         public class AgentInstanceInfo
         {
-            [JsonProperty("id")]
+            [JsonProperty("prot")]
             public int PrefId;
 
             [JsonProperty("coord")]
             public int[] Coords;
+
+            [JsonProperty("target")]
+            public string Target;
+
+            [JsonProperty("id")]
+            public string Id;
         }
 
         [JsonProperty("meta")]
@@ -110,6 +116,8 @@ class LevelLoader
             {
                 var go = UnityEngine.Object.Instantiate(agents[inf.PrefId].Prefab);
                 go.GetComponent<Agent>().Position = new Coord(inf.Coords[0], inf.Coords[1]);
+                go.GetComponent<Agent>().Target = inf.Target;
+                go.GetComponent<Agent>().Id = inf.Id;
                 return go.GetComponent<Agent>();
             };
         }

@@ -17,7 +17,6 @@ public class Loader : MonoBehaviour
         {
             { KeyCode.A, SummonTrap },
             { KeyCode.M, MovePlayer },
-            { KeyCode.N, Level.CurrentLevel.NextTurn }
         };
     }
 
@@ -75,7 +74,6 @@ public class Loader : MonoBehaviour
 
     private void CmdOnCommandComplete(Command command)
     {
-        Level.CurrentLevel.SightResolveComplete += CurrentLevelOnSightResolveComplete;
         Level.CurrentLevel.ResolveSight();
 
         if (command is WalkCommand)
@@ -95,6 +93,7 @@ public class Loader : MonoBehaviour
             _first = false;
             return;
         }
+
         Level.CurrentLevel.NextTurn();
     }
 

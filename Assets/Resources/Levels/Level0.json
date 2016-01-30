@@ -31,6 +31,15 @@
 		},
 		{
 			"prefab": "LerpAgent"
+		},
+		{
+			"prefab": "Gate"
+		},
+		{
+			"prefab": "Wall"
+		},
+		{
+			"prefab": "WallRemove"
 		}
 	],
 
@@ -105,18 +114,38 @@
 			"coord": [2, 1],
 			"tileinfo": 2,
 			"elevate": 1
+		},
+		{
+			"coord": [4, 1],
+			"tileinfo": 0,
+			"elevate": 0.3
+		},
+		{
+			"coord": [5, 1],
+			"tileinfo": 0,
+			"elevate": 0.3
 		}
 	],
 
 	"agents":
 	[
 		{
-			"coord": [0, 0],
-			"id": 2
+			"coord": [0, 3],
+			"prot": 1
 		},
 		{
-			"coord": [0, 3],
-			"id": 1
+			"coord": [5, 1],
+			"prot": 3
+		},
+		{
+			"coord": [3, 1],
+			"prot": 4,
+			"id": "gate_blocker"
+		},
+		{
+			"coord": [0, 0],
+			"prot": 5,
+			"target": "gate_blocker"
 		}
 	]
 }
