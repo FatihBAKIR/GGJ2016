@@ -10,6 +10,13 @@ public class Tile
     public TileInfo Info { get; private set; }
     public float Elevation { get; private set; }
     public Coord Coordinate { get; private set; }
+    public Vector3 Position
+    {
+        get
+        {
+            return Grid.CoordToPosition(Coordinate) + (Elevation + 0.5f) * Vector3.up;
+        }
+    }
 
     public Tile(TileInfo info, Coord pos, float height)
     {
@@ -56,6 +63,11 @@ public class Grid
     public Vector3 CoordToPosition(int x, int y)
     {
         return new Vector3(x, 0, y);
+    }
+
+    public Vector3 CoordSurfacePosition(Coord crd)
+    {
+        return _tiles[crd.X, crd.Y].Position;
     }
 
     public void Set(Tile t)
@@ -112,6 +124,11 @@ public class Level
 {
     private readonly Grid _grid;
 
+    public Grid Grid
+    {
+        get { return _grid; }
+    }
+
     private readonly List<Agent> _agents;
 
     private readonly TileInfo[] _initialTiles;
@@ -167,6 +184,7 @@ public class Level
             CurrentLevel.Clear();
             _level = null;
         }
+        _level = this;
 
         GameObject tilePref = Resources.Load<GameObject>("Tile");
         tilePref.GetComponent<MeshFilter>().sharedMesh = CubeGen.TileCube;
@@ -190,7 +208,6 @@ public class Level
             _agents.Add(initializer());
         }
 
-        _level = this;
     }
 
     public void Clear()
@@ -237,8 +254,8 @@ public class Level
 
     public Agent Instantiate(string name, Coord coord)
     {
-        Debug.Log(coord + " -> " + Grid.CoordToPosition(coord));
-        var go = Object.Instantiate(_initialAgents[AgentIdByName(name)].Prefab, Grid.CoordToPosition(coord), Quaternion.identity) as GameObject;
+        //Debug.Log(coord + " -> " + Grid.CoordToPosition(coord));
+        var go = Object.Instantiate(_initialAgents[AgentIdByName(name)].Prefab, _grid.CoordSurfacePosition(coord), Quaternion.identity) as GameObject;
         _agents.Add(go.GetComponent<Agent>());
         return go.GetComponent<Agent>();
     }

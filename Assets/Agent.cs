@@ -7,6 +7,13 @@ public abstract class Agent : MonoBehaviour
     private Coord _coord;
     public int Wait { get; set; }
 
+    private Grid Grid
+    {
+        get
+        {
+            return Level.CurrentLevel.Grid;
+        }
+    }
     public Coord Position
     {
         get
@@ -16,7 +23,7 @@ public abstract class Agent : MonoBehaviour
         set 
         { 
             _coord = value;
-            transform.position = Grid.CoordToPosition(_coord);
+            transform.position = Grid.CoordSurfacePosition(_coord);
         }
     }
 
