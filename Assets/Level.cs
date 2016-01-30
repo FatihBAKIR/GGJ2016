@@ -130,6 +130,7 @@ public class Level
         }
 
         GameObject tilePref = Resources.Load<GameObject>("Tile");
+        tilePref.GetComponent<MeshFilter>().sharedMesh = CubeGen.TileCube;
 
         for (int i = 0; i < _grid.Height; i++)
         {
