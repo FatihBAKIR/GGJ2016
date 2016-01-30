@@ -241,7 +241,17 @@ public class Level
         foreach (var initializer in _initializers)
         {
             var agent = initializer();
-            agent.GetComponent<Renderer>().enabled = false;
+
+            foreach (var rend in agent.GetComponentsInChildren<Renderer>())
+            {
+                rend.enabled = false;
+            }
+
+            if (agent.GetComponent<Renderer>() != null)
+            {
+                agent.GetComponent<Renderer>().enabled = false;
+            }
+
             _agents.Add(agent);
         }
 

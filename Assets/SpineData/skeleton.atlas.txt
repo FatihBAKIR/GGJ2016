@@ -1,0 +1,109 @@
+
+skeleton.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+arka bacak
+  rotate: true
+  xy: 2, 2
+  size: 154, 643
+  orig: 154, 643
+  offset: 0, 0
+  index: -1
+arka kol
+  rotate: true
+  xy: 642, 210
+  size: 166, 349
+  orig: 166, 349
+  offset: 0, 0
+  index: -1
+kalca
+  rotate: false
+  xy: 2, 346
+  size: 522, 673
+  orig: 522, 673
+  offset: 0, 0
+  index: -1
+kelle
+  rotate: false
+  xy: 526, 378
+  size: 485, 641
+  orig: 485, 641
+  offset: 0, 0
+  index: -1
+on bacak
+  rotate: true
+  xy: 2, 158
+  size: 186, 638
+  orig: 186, 638
+  offset: 0, 0
+  index: -1
+on kol
+  rotate: true
+  xy: 647, 24
+  size: 184, 328
+  orig: 184, 328
+  offset: 0, 0
+  index: -1
+
+skeleton2.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+arka alt kol
+  rotate: false
+  xy: 662, 85
+  size: 240, 398
+  orig: 240, 398
+  offset: 0, 0
+  index: -1
+arka ust bacak
+  rotate: false
+  xy: 654, 515
+  size: 179, 466
+  orig: 179, 466
+  offset: 0, 0
+  index: -1
+on alt kol
+  rotate: true
+  xy: 2, 2
+  size: 122, 445
+  orig: 122, 445
+  offset: 0, 0
+  index: -1
+on ust bacak
+  rotate: false
+  xy: 835, 485
+  size: 181, 496
+  orig: 181, 496
+  offset: 0, 0
+  index: -1
+pelerin arka
+  rotate: false
+  xy: 2, 511
+  size: 650, 470
+  orig: 650, 470
+  offset: 0, 0
+  index: -1
+pelerin on
+  rotate: false
+  xy: 2, 126
+  size: 658, 383
+  orig: 658, 383
+  offset: 0, 0
+  index: -1
+
+skeleton3.png
+size: 512,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+vucut
+  rotate: false
+  xy: 2, 2
+  size: 373, 613
+  orig: 373, 613
+  offset: 0, 0
+  index: -1

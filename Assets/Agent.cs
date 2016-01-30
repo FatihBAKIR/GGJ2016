@@ -38,8 +38,11 @@ public abstract class Agent : MonoBehaviour
         {
             rend.enabled = active;
         }
-        
-        GetComponent<Renderer>().enabled = active;
+
+        if (GetComponent<Renderer>() != null)
+        {
+            GetComponent<Renderer>().enabled = active;
+        }
     }
 
     protected abstract void DoStep();
