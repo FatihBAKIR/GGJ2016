@@ -110,13 +110,13 @@ public class EditTool : MonoBehaviour
         var normX = - _tiles.Min((x) => x.Coordinate.X);
         var normY = - _tiles.Min((x) => x.Coordinate.Y);
 
-        var maxX = - _tiles.Max((x) => x.Coordinate.X);
-        var maxY = - _tiles.Max((x) => x.Coordinate.Y);
-        var minX = - _tiles.Min((x) => x.Coordinate.X);
-        var minY = - _tiles.Min((x) => x.Coordinate.Y);
+        var maxX = _tiles.Max((x) => x.Coordinate.X);
+        var maxY = _tiles.Max((x) => x.Coordinate.Y);
+        var minX = _tiles.Min((x) => x.Coordinate.X);
+        var minY = _tiles.Min((x) => x.Coordinate.Y);
 
-        levelInfo.Meta.Height = maxY - minY;
-        levelInfo.Meta.Width = maxX - minX;
+        levelInfo.Meta.Width = levelInfo.Meta.Height = System.Math.Max(maxY - minY + 1, maxX - minX + 1);
+        
         levelInfo.Tiles = new LevelLoader.LevelInfo.TileInstanceInfo[_tiles.Count];
         for (int i = 0; i < _tiles.Count; i++)
         {
