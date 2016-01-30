@@ -15,13 +15,20 @@ public class EditTool : MonoBehaviour
     private GameObject[] agentsPrefabs;
 
     public GameObject materialParent;
+    public GameObject agentParent;
     public GameObject materialEntryPrefab;
+    public GameObject agentEntryPrefab;
     public GameObject materialText;
     public Button saveButton;
     public InputField filenameInput;
 
+    public GameObject tilesButton;
+    public GameObject agentsButton;
+
     private Material _currentMat;
+    private GameObject _currentAgent;
     private GameObject _tilePref;
+    private bool _tileMode = true;
 
     private List<Tile> _tiles = new List<Tile>();
     private List<GameObject> _tileObjects = new List<GameObject>();
@@ -33,6 +40,15 @@ public class EditTool : MonoBehaviour
     void Awake()
     {
         _tilePref = Resources.Load<GameObject>("Tile");
+    }
+
+    public void SetTileMode(bool mode)
+    {
+        _tileMode = mode;
+        tilesButton.SetActive(!mode);
+        materialParent.transform.parent.parent.gameObject.SetActive(mode);
+        agentsButton.SetActive(mode);
+        agentParent.transform.parent.parent.gameObject.SetActive(!mode);
     }
 
     void CreateTile(Coord coordinates, Material material)
@@ -51,7 +67,7 @@ public class EditTool : MonoBehaviour
         materials = Resources.LoadAll<Material>("Tiles");
         _currentMat = materials[0];
         agentsPrefabs = Resources.LoadAll<GameObject>("Agents");
-
+        _currentAgent = agentsPrefabs[0];
         levelInfo = new LevelLoader.LevelInfo();
         levelInfo.Meta = new LevelLoader.LevelInfo.LevelMeta() { Width = 16, Height = 16 };
         levelInfo.TileInfos = new LevelLoader.LevelInfo.TilePrefInfo[materials.Length];
@@ -71,6 +87,8 @@ public class EditTool : MonoBehaviour
 
         saveButton.onClick.AddListener(() => SaveFile(filenameInput.text));
         PopulateMaterials(materialParent);
+        PopulateAgents(agentParent);
+        SetTileMode(true);
     }
 
     void SaveFile(string filename)
@@ -92,6 +110,18 @@ public class EditTool : MonoBehaviour
             button.transform.SetParent(materialParent.transform);
             var m = mat;
             button.GetComponent<Button>().onClick.AddListener(() => SetMat(m));
+        }
+    }
+
+    void PopulateAgents(GameObject agentParent)
+    {
+        foreach (var agent in agentsPrefabs)
+        {
+            var button = Instantiate(agentEntryPrefab) as GameObject;
+            button.transform.FindChild("Text").GetComponent<Text>().text = agent.name;
+            button.transform.SetParent(agentParent.transform);
+            var a = agent;
+            button.GetComponent<Button>().onClick.AddListener(() => SetAgent(a));
         }
     }
     public static string ReplaceLastOccurrence(string Source, string Find, string Replace)
@@ -147,6 +177,12 @@ public class EditTool : MonoBehaviour
     {
         _currentMat = mat;
         materialText.GetComponent<Text>().text = mat.name;
+    }
+
+    void SetAgent(GameObject a)
+    {
+        _currentAgent = a;
+        materialText.GetComponent<Text>().text = a.name;
     }
     // Update is called once per frame
     void Update()
