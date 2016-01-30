@@ -21,6 +21,9 @@ class LevelLoader
         {
             [JsonProperty("material")]
             public string Mat;
+
+            [JsonProperty("canwalk")] 
+            public bool CanWalk;
         }
 
         public class AgentPrefInfo
@@ -86,7 +89,7 @@ class LevelLoader
 
         for (int i = 0; i < info.TileInfos.Length; i++)
         {
-            tinfos[i] = new TileInfo(Resources.Load<Material>(string.Format("Tiles/{0}", info.TileInfos[i].Mat)));
+            tinfos[i] = new TileInfo(Resources.Load<Material>(string.Format("Tiles/{0}", info.TileInfos[i].Mat)), info.TileInfos[i].CanWalk);
         }
 
         for (int i = 0; i < info.AgentInfos.Length; i++)

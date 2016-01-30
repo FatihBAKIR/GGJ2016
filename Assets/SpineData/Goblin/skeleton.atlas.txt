@@ -1,0 +1,193 @@
+
+skeleton.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+arka_ayak
+  rotate: false
+  xy: 799, 565
+  size: 162, 450
+  orig: 162, 450
+  offset: 0, 0
+  index: -1
+arka_el_parmak_2
+  rotate: true
+  xy: 697, 26
+  size: 73, 253
+  orig: 73, 253
+  offset: 0, 0
+  index: -1
+govde
+  rotate: false
+  xy: 2, 8
+  size: 323, 484
+  orig: 323, 484
+  offset: 0, 0
+  index: -1
+kalca
+  rotate: false
+  xy: 2, 494
+  size: 394, 521
+  orig: 394, 521
+  offset: 0, 0
+  index: -1
+kelle_alt
+  rotate: false
+  xy: 398, 505
+  size: 399, 510
+  orig: 399, 510
+  offset: 0, 0
+  index: -1
+on_ayak
+  rotate: false
+  xy: 327, 67
+  size: 368, 425
+  orig: 368, 425
+  offset: 0, 0
+  index: -1
+on_bacak
+  rotate: false
+  xy: 697, 101
+  size: 315, 402
+  orig: 315, 402
+  offset: 0, 0
+  index: -1
+on_el_parmak_2
+  rotate: true
+  xy: 327, 2
+  size: 63, 247
+  orig: 63, 247
+  offset: 0, 0
+  index: -1
+
+skeleton2.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+arka_bacak
+  rotate: true
+  xy: 547, 664
+  size: 353, 366
+  orig: 353, 366
+  offset: 0, 0
+  index: -1
+arka_bilek
+  rotate: true
+  xy: 302, 26
+  size: 318, 361
+  orig: 318, 361
+  offset: 0, 0
+  index: -1
+arka_el
+  rotate: false
+  xy: 811, 5
+  size: 124, 202
+  orig: 124, 202
+  offset: 0, 0
+  index: -1
+arka_el_basparmak
+  rotate: false
+  xy: 911, 373
+  size: 99, 214
+  orig: 99, 214
+  offset: 0, 0
+  index: -1
+arka_el_parmak_1
+  rotate: true
+  xy: 2, 2
+  size: 92, 234
+  orig: 92, 234
+  offset: 0, 0
+  index: -1
+arka_kol
+  rotate: false
+  xy: 2, 473
+  size: 267, 544
+  orig: 267, 544
+  offset: 0, 0
+  index: -1
+kelle_agiz
+  rotate: true
+  xy: 302, 346
+  size: 130, 235
+  orig: 130, 235
+  offset: 0, 0
+  index: -1
+kelle_ust
+  rotate: false
+  xy: 547, 352
+  size: 362, 310
+  orig: 362, 310
+  offset: 0, 0
+  index: -1
+kulak_sag
+  rotate: false
+  xy: 811, 209
+  size: 211, 141
+  orig: 211, 141
+  offset: 0, 0
+  index: -1
+kulak_sol
+  rotate: true
+  xy: 665, 61
+  size: 289, 144
+  orig: 289, 144
+  offset: 0, 0
+  index: -1
+on_bilek
+  rotate: true
+  xy: 2, 96
+  size: 375, 298
+  orig: 375, 298
+  offset: 0, 0
+  index: -1
+on_el_parmak_1
+  rotate: false
+  xy: 915, 792
+  size: 106, 225
+  orig: 106, 225
+  offset: 0, 0
+  index: -1
+on_el_parmak_3
+  rotate: false
+  xy: 915, 589
+  size: 105, 201
+  orig: 105, 201
+  offset: 0, 0
+  index: -1
+on_kol
+  rotate: false
+  xy: 271, 478
+  size: 274, 539
+  orig: 274, 539
+  offset: 0, 0
+  index: -1
+
+skeleton3.png
+size: 512,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+arka_el_parmak_3
+  rotate: true
+  xy: 126, 2
+  size: 115, 200
+  orig: 115, 200
+  offset: 0, 0
+  index: -1
+on_el
+  rotate: false
+  xy: 2, 37
+  size: 122, 199
+  orig: 122, 199
+  offset: 0, 0
+  index: -1
+on_el_basparmak
+  rotate: true
+  xy: 126, 119
+  size: 117, 200
+  orig: 117, 200
+  offset: 0, 0
+  index: -1

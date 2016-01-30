@@ -8,17 +8,29 @@
 	"tileinfo":
 	[
 		{
-			"material": "StoneTile"
+			"material": "StoneTile",
+			"canwalk": true
 		},
 		{
-			"material": "SandTile"
+			"material": "SandTile",
+			"canwalk": true
 		},
 		{
-			"material": "GrassTile"
+			"material": "GrassTile",
+			"canwalk": true
 		},
 		{
-			"material": "RedTile"
+			"material": "RedTile",
+			"canwalk": true
 		},
+		{
+			"material": "WaterTile",
+			"canwalk": false
+		},
+		{
+			"material": "WaterStoneTile",
+			"canwalk": true
+		}
 	],
 
 	"agentinfo":
@@ -30,7 +42,7 @@
 			"prefab": "Player"
 		},
 		{
-			"prefab": "LerpAgent"
+			"prefab": "Goblin"
 		},
 		{
 			"prefab": "Gate"
@@ -47,22 +59,27 @@
 	[
 		{
 			"coord": [0, 0],
-			"tileinfo": 1,
+			"tileinfo": 0,
 			"elevate": 0
 		},
 		{
 			"coord": [1, 0],
-			"tileinfo": 2,
+			"tileinfo": 0,
 			"elevate": 0
 		},
 		{
 			"coord": [0, 1],
-			"tileinfo": 2,
+			"tileinfo": 0,
+			"elevate": 0
+		},
+		{
+			"coord": [0, 2],
+			"tileinfo": 5,
 			"elevate": 0
 		},
 		{
 			"coord": [1, 1],
-			"tileinfo": 2,
+			"tileinfo": 0,
 			"elevate": 0
 		},
 		{
@@ -82,32 +99,32 @@
 		},
 		{
 			"coord": [2, 3],
-			"tileinfo": 0,
+			"tileinfo": 2,
 			"elevate": 0
 		},
 		{
 			"coord": [3, 3],
-			"tileinfo": 0,
+			"tileinfo": 1,
 			"elevate": 0
 		},
 		{
 			"coord": [3, 2],
-			"tileinfo": 0,
+			"tileinfo": 1,
 			"elevate": 0
 		},
 		{
 			"coord": [3, 1],
-			"tileinfo": 0,
+			"tileinfo": 1,
 			"elevate": 0
 		},
 		{
 			"coord": [3, 0],
-			"tileinfo": 0,
+			"tileinfo": 1,
 			"elevate": 0
 		},
 		{
 			"coord": [2, 0],
-			"tileinfo": 0,
+			"tileinfo": 2,
 			"elevate": 0
 		},
 		{
@@ -117,20 +134,54 @@
 		},
 		{
 			"coord": [4, 1],
-			"tileinfo": 0,
-			"elevate": 0.3
+			"tileinfo": 5,
+			"elevate": 0
 		},
 		{
 			"coord": [5, 1],
-			"tileinfo": 0,
-			"elevate": 0.3
+			"tileinfo": 5,
+			"elevate": 0
+		},
+		{
+			"coord": [5, 0],
+			"tileinfo": 4,
+			"elevate": 0
+		},
+		{
+			"coord": [5, 2],
+			"tileinfo": 4,
+			"elevate": 0
+		},
+		{
+			"coord": [5, 3],
+			"tileinfo": 4,
+			"elevate": 0
+		},
+		{
+			"coord": [4, 0],
+			"tileinfo": 4,
+			"elevate": 0
+		},
+		{
+			"coord": [4, 2],
+			"tileinfo": 4,
+			"elevate": 0
+		},
+		{
+			"coord": [4, 3],
+			"tileinfo": 4,
+			"elevate": 0
 		}
 	],
 
 	"agents":
 	[
 		{
-			"coord": [0, 3],
+			"coord": [0, 0],
+			"prot": 2
+		},
+		{
+			"coord": [0, 2],
 			"prot": 1
 		},
 		{

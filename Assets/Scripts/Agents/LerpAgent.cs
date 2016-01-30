@@ -50,7 +50,10 @@ public class LerpAgent : Agent
         }
         else
         {
-            _cmd.Apply(possible[Random.Range(0, possible.Length)].Coordinate);
+            if (Random.Range(0, 100) < 60)
+            {
+                _cmd.Apply(possible[Random.Range(0, possible.Length)].Coordinate);
+            }
         }
     }
 }
