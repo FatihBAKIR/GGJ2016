@@ -7,6 +7,5 @@ public class Trap : Agent
 
     protected override void DoStep()
     {
-        Step();
     }
 }

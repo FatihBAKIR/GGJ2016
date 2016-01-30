@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract class Agent : MonoBehaviour
 {
+    public bool Blocks;
     private Coord _coord;
     public int Wait { get; set; }
 

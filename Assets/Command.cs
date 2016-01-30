@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
 
 abstract class Command
 {
+    public event Action<Command> CommandComplete = delegate { };
+
     protected int Cost = 1;
     protected Agent Source;
 
@@ -19,6 +21,11 @@ abstract class Command
     protected virtual void DoApply()
     {
     }
+
+    protected void Completed()
+    {
+        CommandComplete(this);
+    }
 }
 
 abstract class TileCommand : Command
@@ -27,6 +34,16 @@ abstract class TileCommand : Command
     {
         Source.Wait += Cost;
         DoApply(tile);
+    }
+
+    public virtual int Range
+    {
+        get { return 0; }
+    }
+
+    public virtual bool CanApply(Coord tile)
+    {
+        return true;
     }
 
     protected abstract void DoApply(Coord tile);
@@ -55,13 +72,31 @@ sealed class SpawnCommand : TileCommand
     protected override void DoApply(Coord tile)
     {
         Level.CurrentLevel.Instantiate(_name, tile);
+        Completed();
     }
 }
 
 sealed class WalkCommand : TileCommand
 {
+    public override int Range
+    {
+        get { return 1; }
+    }
+
+    public override bool CanApply(Coord tile)
+    {
+        return Coord.Distance(tile, Source.Position) <= Range && Level.CurrentLevel.Get(tile).AgentsOnTile(agent => agent.Blocks).Length == 0;
+    }
+
     protected override void DoApply(Coord tile)
     {
+        Source.GetComponent<MoveTowards>().MoveComplete += OnMoveComplete;
         Source.GetComponent<MoveTowards>().SetTarget(tile);
+    }
+
+    private void OnMoveComplete(MoveTowards moveTowards)
+    {
+        Completed();
+        Source.GetComponent<MoveTowards>().MoveComplete -= OnMoveComplete;
     }
 }

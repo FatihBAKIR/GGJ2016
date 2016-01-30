@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class Tile
 {
-    public GameObject Obj { get; private set; }
+    public GameObject Obj { get; set; }
     public TileInfo Info { get; private set; }
     public float Elevation { get; private set; }
     public Coord Coordinate { get; private set; }
@@ -15,6 +16,16 @@ public class Tile
         Info = info;
         Coordinate = pos;
         Elevation = height;
+    }
+
+    public Agent[] AgentsOnTile()
+    {
+        return Object.FindObjectsOfType<Agent>().Where(o => o.Position == Coordinate).ToArray();
+    }
+
+    public Agent[] AgentsOnTile(Func<Agent, bool> filter)
+    {
+        return Object.FindObjectsOfType<Agent>().Where(agent => (agent.Position == Coordinate && filter(agent))).ToArray();
     }
 }
 
@@ -57,30 +68,43 @@ public class Grid
         return _tiles[x, y];
     }
 
-    public List<Tile> GetLoS(int x, int y, int radius)
+    public Tile[] GetLoS(int x, int y, int radius)
     {
         List<Tile> losTiles = new List<Tile>();
-        for (int i = -radius; i != radius; i++)
+        
+        for (int i = -radius; i < radius + 1; i++)
         {
-            for (int j = -(radius - Math.Abs(i)); j != (radius - Math.Abs(i)); j++)
+            for (int j = -(radius - Math.Abs(i)); j < 1 + (radius - Math.Abs(i)); j++)
             {
-                if (x + i < 0 || x + i > Width || y + j < 0 || y + j > Height) continue;
+                if (x + i < 0 || x + i >= Width || y + j < 0 || y + j >= Height) continue;
 
-                Vector3 origin = CoordToPosition(x, y) + (_tiles[x,y] == null ? 0 : _tiles[x,y].Elevation + 1) * Vector3.up;
+                Vector3 origin = CoordToPosition(x, y) + (_tiles[x, y] == null ? 0 : _tiles[x, y].Elevation + 1) * Vector3.up;
                 Vector3 direction = CoordToPosition(x + i, y + j) + Vector3.up - origin;
                 float distance = direction.magnitude;
                 direction.Normalize();
 
-                if(!Physics.Raycast(origin , direction, distance, 1 << LayerMask.NameToLayer("Grid")))
+                if (!Physics.Raycast(origin, direction, distance, 1 << LayerMask.NameToLayer("Grid")))
                     losTiles.Add(_tiles[x + i, y + j]);
             }
         }
-        return losTiles;
+
+        return losTiles.ToArray();
     }
 
     public Tile[] Get(int x, int y, int r)
     {
-        throw new NotImplementedException();
+        List<Tile> tiles = new List<Tile>();
+        for (int i = Mathf.Max(y - r, 0); i < Mathf.Min(y + r + 1, Height); i++)
+        {
+            for (int j = Mathf.Max(x - r, 0); j < Mathf.Min(x + r + 1, Width); j++)
+            {
+                if (_tiles[j, i] != null && Coord.Distance(_tiles[j, i].Coordinate, new Coord(x, y)) <= r)
+                {
+                    tiles.Add(_tiles[j, i]);
+                }
+            }
+        }
+        return tiles.ToArray();
     }
 }
 
@@ -93,7 +117,7 @@ public class Level
     private readonly TileInfo[] _initialTiles;
     private readonly AgentInfo[] _initialAgents;
 
-    private readonly Dictionary<string, int> _agentMap; 
+    private readonly Dictionary<string, int> _agentMap;
 
     private readonly Func<Agent>[] _initializers;
 
@@ -111,6 +135,16 @@ public class Level
         _agents = new List<Agent>();
     }
 
+    public Tile Get(Coord c)
+    {
+        return Get(c.X, c.Y);
+    }
+
+    public Tile[] Get(Coord c, int r)
+    {
+        return Get(c.X, c.Y, r);
+    }
+
     public Tile Get(int x, int y)
     {
         return _grid.Get(x, y);
@@ -119,6 +153,11 @@ public class Level
     public Tile[] Get(int x, int y, int r)
     {
         return _grid.Get(x, y, r);
+    }
+
+    public Tile[] GetLoS(Coord c, int r)
+    {
+        return _grid.GetLoS(c.X, c.Y, r);
     }
 
     public void LoadToScene()
@@ -139,8 +178,9 @@ public class Level
                 {
                     continue;
                 }
-                var go = Object.Instantiate(tilePref, Grid.CoordToPosition(_grid.Get(j, i).Coordinate) + _grid.Get(j,i).Elevation * Vector3.up, Quaternion.identity) as GameObject;
+                var go = Object.Instantiate(tilePref, Grid.CoordToPosition(_grid.Get(j, i).Coordinate) + _grid.Get(j, i).Elevation * Vector3.up, Quaternion.identity) as GameObject;
                 go.GetComponent<Renderer>().material = _grid.Get(j, i).Info.Material;
+                _grid.Get(j, i).Obj = go;
             }
         }
 
@@ -196,6 +236,7 @@ public class Level
 
     public Agent Instantiate(string name, Coord coord)
     {
+        Debug.Log(coord + " -> " + Grid.CoordToPosition(coord));
         var go = Object.Instantiate(_initialAgents[AgentIdByName(name)].Prefab, Grid.CoordToPosition(coord), Quaternion.identity) as GameObject;
         _agents.Add(go.GetComponent<Agent>());
         return go.GetComponent<Agent>();

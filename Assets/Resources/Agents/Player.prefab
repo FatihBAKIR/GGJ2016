@@ -87,6 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de7b3de39b9fb5742b8578adb5a26628, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Blocks: 0
 --- !u!136 &13613432
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -106,7 +107,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: Blocks
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 181258}
