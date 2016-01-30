@@ -37,6 +37,11 @@ public class Tile
     {
         return Object.FindObjectsOfType<Agent>().Where(agent => (agent.Position == Coordinate && filter(agent))).ToArray();
     }
+
+    public void Elevate(float delta)
+    {
+        this.Elevation += delta;
+    }
 }
 
 public class Grid

@@ -249,19 +249,37 @@ public class EditTool : MonoBehaviour
 
             if (_tileMode)
             {
-                if (Input.GetMouseButton(0))
+                if (Input.GetKey(KeyCode.LeftShift) && onTile)
                 {
-                    if (!onTile)
-                        CreateTile(coord, _currentMat);
-                }
-                if (Input.GetMouseButton(1))
-                {
-                    if (onTile)
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        _tileObjects.Remove(select_tile.Obj);
-                        Destroy(select_tile.Obj);
-                        _tiles.Remove(select_tile);
-                        select_tile = null;
+                        select_tile.Elevate(0.1f);
+                        select_tile.Obj.transform.position += Vector3.up * 0.1f;
+                        if(select_agent != null) select_agent.obj.transform.position += Vector3.up * 0.1f;
+                    }
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        select_tile.Elevate(-0.1f);
+                        select_tile.Obj.transform.position -= Vector3.up * 0.1f;
+                        if(select_agent != null) select_agent.obj.transform.position -= Vector3.up * 0.1f;
+                    }
+                }
+                else
+                {
+                    if (Input.GetMouseButton(0))
+                    {
+                        if (!onTile)
+                            CreateTile(coord, _currentMat);
+                    }
+                    if (Input.GetMouseButton(1))
+                    {
+                        if (onTile)
+                        {
+                            _tileObjects.Remove(select_tile.Obj);
+                            Destroy(select_tile.Obj);
+                            _tiles.Remove(select_tile);
+                            select_tile = null;
+                        }
                     }
                 }
             }
