@@ -77,9 +77,9 @@ sealed class SpawnCommand : TileCommand
     }
 }
 
-sealed class WalkCommand : TileCommand
+internal sealed class WalkCommand : TileCommand
 {
-    enum Dir
+    private enum Dir
     {
         PosX,
         PosZ,
@@ -87,7 +87,7 @@ sealed class WalkCommand : TileCommand
         NegZ
     }
 
-    Dir GetDir(Coord target)
+    private Dir GetDir(Coord target)
     {
         Coord move = target - Source.Position;
 
@@ -160,5 +160,41 @@ sealed class WalkCommand : TileCommand
         Source.GetComponent<MoveTowards>().MoveComplete -= OnMoveComplete;
         _pr.Fulfill();
         _pr = null;
+    }
+}
+
+sealed class RitualCommand : TileCommand
+{
+    public override int Range
+    {
+        get { return 1; }
+    }
+
+    public override bool CanApply(Coord tile)
+    {
+        return Coord.Distance(tile, Source.Position) <= Range &&
+               Level.CurrentLevel.Get(tile).AgentsOnTile(agent => agent is Sigil).Length > 0 &&
+               Mathf.Abs(Level.CurrentLevel.Get(tile).Elevation - Level.CurrentLevel.Get(Source.Position).Elevation) <=
+               0.5f;
+    }
+
+    private Promise _pr;
+
+    protected override void DoApply(Coord tile)
+    {
+        Level.CurrentLevel.AddPromise(_pr = new Promise());
+
+        Debug.Log("ritual...");
+        var a = Level.CurrentLevel.Get(tile).AgentsOnTile(agent => agent is Sigil)[0];
+        ((Sigil)a).Activate();
+        ((Sigil)a).Activated += OnActivated;
+        Source.GetComponentInChildren<SkeletonAnimation>().AnimationName = "ritual_1";
+    }
+
+    private void OnActivated(Sigil sigil)
+    {
+        Source.GetComponentInChildren<SkeletonAnimation>().AnimationName = "idle";
+        _pr.Fulfill();
+        _pr = null;    
     }
 }

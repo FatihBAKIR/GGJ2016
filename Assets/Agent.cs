@@ -50,6 +50,8 @@ public abstract class Agent : MonoBehaviour
             {
                 GetComponent<Renderer>().enabled = active;
             }
+
+            DoUpdate();
         }
         catch
         {
@@ -59,4 +61,5 @@ public abstract class Agent : MonoBehaviour
 
     protected virtual void DoStart() { }
     protected virtual void DoStep() { }
+    protected virtual void DoUpdate() { }
 }

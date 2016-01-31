@@ -17,7 +17,7 @@ public class Loader : MonoBehaviour
 
     void Awake()
     {
-        var level = LevelLoader.LoadLevel("Levelqwer");
+        var level = LevelLoader.LoadLevel("Level0");
         level.LoadToScene();
         LevelOnRoundFinished();
         level.RoundFinished += LevelOnRoundFinished;
@@ -27,6 +27,7 @@ public class Loader : MonoBehaviour
             { KeyCode.A, SummonTrap },
             { KeyCode.M, MovePlayer },
             { KeyCode.D, SummonDecoy },
+            { KeyCode.R, () => SetCurrentTile(new RitualCommand()) }
         };
 
         GameObject.Find("Spell1").GetComponent<Button>().onClick.AddListener(SummonTrap);

@@ -298,12 +298,6 @@ public class Level
         ResolveSight();
     }
 
-    public void Destroy(Agent a)
-    {
-        if (a == null) return;
-        _delete[_agents.IndexOf(a)] = true;
-    }
-
     void ResolveSight()
     {
         var tilesSeen = GetLoS(Object.FindObjectOfType<Player>().Position, 2);
@@ -396,6 +390,14 @@ public class Level
         {
             RoundFinished();
         }
+    }
+
+    public void Destroy(Agent a)
+    {
+        if (a == null) return;
+
+        Debug.Log(_agents.IndexOf(a));
+        _delete[_agents.IndexOf(a)] = true;
     }
 
     public void CheckConditions()
