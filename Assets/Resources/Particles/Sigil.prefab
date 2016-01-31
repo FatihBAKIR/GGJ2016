@@ -291,10 +291,10 @@ ParticleSystem:
         m_NumAlphaKeys: 2
       minColor:
         serializedVersion: 2
-        rgba: 846790625
+        rgba: 3776381181
       maxColor:
         serializedVersion: 2
-        rgba: 855637768
+        rgba: 3624468287
       minMaxState: 2
     startSize:
       scalar: 0.02
@@ -1745,10 +1745,10 @@ ParticleSystem:
         m_NumAlphaKeys: 2
       minColor:
         serializedVersion: 2
-        rgba: 847314943
+        rgba: 4278782450
       maxColor:
         serializedVersion: 2
-        rgba: 850984778
+        rgba: 3545825041
       minMaxState: 2
     startSize:
       scalar: 0.8
@@ -3204,7 +3204,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
       minColor:
         serializedVersion: 2
-        rgba: 3702783999
+        rgba: 3693810687
       maxColor:
         serializedVersion: 2
         rgba: 3707764735
