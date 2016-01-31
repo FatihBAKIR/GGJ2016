@@ -290,6 +290,10 @@ public class Level
             _agents.Add(agent);
         }
 
+        Camera.main.GetComponent<CameraController>().target.position = _agents.Where((x) => x.name == "Player(Clone)").First().transform.position;
+        Camera.main.GetComponent<CameraController>().targetOffset = Vector3.zero;
+
+
         LevelLoaded();
         ResolveSight();
     }

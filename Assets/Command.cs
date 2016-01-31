@@ -120,7 +120,7 @@ sealed class WalkCommand : TileCommand
     {
         return Coord.Distance(tile, Source.Position) <= Range &&
                Level.CurrentLevel.Get(tile).AgentsOnTile(agent => agent.Blocks).Length == 0 &&
-               Level.CurrentLevel.Get(tile).Elevation <= Level.CurrentLevel.Get(Source.Position).Elevation + 0.5f &&
+               Mathf.Abs(Level.CurrentLevel.Get(tile).Elevation - Level.CurrentLevel.Get(Source.Position).Elevation) <= 0.5f &&
                Level.CurrentLevel.Get(tile).Coordinate != Source.Position &&
                Level.CurrentLevel.Get(tile).Info.CanWalk;
     }
