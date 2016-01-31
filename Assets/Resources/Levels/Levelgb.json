@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "width": 4,
+    "height": 4
+  },
+  "tileinfo": [
+    {
+      "material": "GrassTile",
+      "canwalk": true
+    },
+    {
+      "material": "RedTile",
+      "canwalk": false
+    },
+    {
+      "material": "SandTile",
+      "canwalk": true
+    },
+    {
+      "material": "StoneTile",
+      "canwalk": true
+    },
+    {
+      "material": "WallTile",
+      "canwalk": false
+    },
+    {
+      "material": "WaterStoneTile",
+      "canwalk": true
+    },
+    {
+      "material": "WaterTile",
+      "canwalk": false
+    }
+  ],
+  "agentinfo": [
+    { "prefab": "Gate" },
+    { "prefab": "Goblin" },
+    { "prefab": "LerpAgent" },
+    { "prefab": "Player" },
+    { "prefab": "Trap" },
+    { "prefab": "Wall" },
+    { "prefab": "WallRemove" }
+  ],
+  "tiles": [
+    {
+      "coord": [ 2, 0 ],
+      "tileinfo": 3,
+      "elevate": 0.0
+    },
+    {
+      "coord": [ 1, 0 ],
+      "tileinfo": 3,
+      "elevate": 0.0
+    },
+    {
+      "coord": [ 0, 0 ],
+      "tileinfo": 3,
+      "elevate": 0.0
+    },
+    {
+      "coord": [ 1, 1 ],
+      "tileinfo": 3,
+      "elevate": 0.0
+    },
+    {
+      "coord": [ 0, 2 ],
+      "tileinfo": 3,
+      "elevate": 0.0
+    },
+    {
+      "coord": [ 0, 3 ],
+      "tileinfo": 3,
+      "elevate": 0.0
+    }
+  ],
+  "agents": [
+    {
+      "prot": 3,
+      "coord": [ 1, 1 ],
+      "target": null,
+      "id": null
+    }
+  ]
+}
