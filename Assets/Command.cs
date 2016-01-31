@@ -198,3 +198,25 @@ sealed class RitualCommand : TileCommand
         _pr = null;    
     }
 }
+
+sealed class SmiteCommand : TileCommand
+{
+    public override int Range
+    {
+        get { return 1; }
+    }
+
+    public override bool CanApply(Coord tile)
+    {
+        return Coord.Distance(tile, Source.Position) <= Range &&
+               Level.CurrentLevel.Get(tile).AgentsOnTile(agent => agent is LerpAgent).Length > 0 &&
+               Level.CurrentLevel.Get(tile).Coordinate != Source.Position;
+    }
+
+    protected override void DoApply(Coord tile)
+    {
+        var spawn = new SpawnCommand("Smite");
+        spawn.SetSource(Source);
+        spawn.Apply(tile);
+    }
+}

@@ -372,6 +372,8 @@ public class Level
         _turnPromises.Clear();
         for (int i = _agents.Count - 1; i >= 0; i--)
         {
+            if (_delete[i]) continue;
+            
             _agents[i].Step();
         }
 

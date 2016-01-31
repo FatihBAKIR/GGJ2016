@@ -55,6 +55,9 @@
 		},
 		{
 			"prefab": "Decoy"
+		},
+		{
+			"prefab": "Smite"
 		}
 	],
 

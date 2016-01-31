@@ -21,20 +21,32 @@ public class Loader : MonoBehaviour
         level.LoadToScene();
         LevelOnRoundFinished();
         level.RoundFinished += LevelOnRoundFinished;
-
+        
         _keys = new Dictionary<KeyCode, Action>
         {
             { KeyCode.A, SummonTrap },
             { KeyCode.M, MovePlayer },
             { KeyCode.D, SummonDecoy },
-            { KeyCode.R, () => SetCurrentTile(new RitualCommand()) }
+            { KeyCode.R, Ritual },
+            { KeyCode.S, Smite }
         };
 
         GameObject.Find("Spell1").GetComponent<Button>().onClick.AddListener(SummonTrap);
         GameObject.Find("Spell2").GetComponent<Button>().onClick.AddListener(MovePlayer);
         GameObject.Find("Spell3").GetComponent<Button>().onClick.AddListener(SummonDecoy);
+        GameObject.Find("Spell4").GetComponent<Button>().onClick.AddListener(Smite);
 
         _lastTrapTurn = -4;
+    }
+
+    void Ritual()
+    {
+        SetCurrentTile(new RitualCommand());
+    }
+
+    void Smite()
+    {
+        SetCurrentTile(new SmiteCommand());
     }
 
     private void LevelOnRoundFinished()
