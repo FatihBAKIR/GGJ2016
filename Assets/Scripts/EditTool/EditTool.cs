@@ -48,7 +48,6 @@ public class EditTool : MonoBehaviour
     void Awake()
     {
         _tilePref = Resources.Load<GameObject>("Tile");
-        _tilePref.GetComponent<MeshFilter>().sharedMesh = CubeGen.TileCube;
     }
 
     public void SetTileMode(bool mode)
@@ -152,13 +151,6 @@ public class EditTool : MonoBehaviour
             var m = mat;
             button.GetComponent<Button>().onClick.AddListener(() => SetMat(m));
         }
-    }
-
-        if (place == -1)
-            return Source;
-
-        string result = Source.Remove(place, Find.Length).Insert(place, Replace);
-        return result;
     }
 
     void PopulateAgents(GameObject agentParent)
