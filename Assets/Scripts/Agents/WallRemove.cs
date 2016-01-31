@@ -34,7 +34,6 @@ public class WallRemove : Sigil
 
         _t += Time.deltaTime;
 
-        Debug.Log(_t);
         if (_t >= 1.2f)
         {
             _done = true;

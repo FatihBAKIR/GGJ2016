@@ -17,7 +17,7 @@ public class Loader : MonoBehaviour
 
     void Awake()
     {
-        var level = LevelLoader.LoadLevel("Level0");
+        var level = LevelLoader.LoadLevel("Levelzbam");
         level.LoadToScene();
         LevelOnRoundFinished();
         level.RoundFinished += LevelOnRoundFinished;
@@ -35,8 +35,17 @@ public class Loader : MonoBehaviour
         GameObject.Find("Spell2").GetComponent<Button>().onClick.AddListener(MovePlayer);
         GameObject.Find("Spell3").GetComponent<Button>().onClick.AddListener(SummonDecoy);
         GameObject.Find("Spell4").GetComponent<Button>().onClick.AddListener(Smite);
+        GameObject.Find("Spell5").GetComponent<Button>().onClick.AddListener(Reveal);
 
         _lastTrapTurn = -4;
+    }
+
+    void Reveal()
+    {
+        SetCurrentTile(new SpawnCommand("Reveal"));
+        _currentTile.Apply(Level.CurrentLevel.PlayerTile.Coordinate);
+        _currentTile = null;
+        _playerPromise.Fulfill();
     }
 
     void Ritual()
@@ -142,16 +151,42 @@ public class Loader : MonoBehaviour
         SetCurrentTile(new SpawnCommand("Decoy"));
     }
 
+    static TileCommand Guess(Coord coord)
+    {
+        TileCommand tc = new RitualCommand();
+        tc.SetSource(FindObjectOfType<Player>());
+
+        if (tc.CanApply(coord))
+        {
+            return tc;
+        }
+
+        tc = new WalkCommand();
+        tc.SetSource(FindObjectOfType<Player>());
+        if (tc.CanApply(coord))
+        {
+            return tc;
+        }
+
+        return null;
+    }
+
     void CheckTileClick()
     {
-        if (_currentTile == null) return;
-
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (Input.GetMouseButtonUp(0) && Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Grid")))
         {
             var coord = Grid.PositionToCoord(hit.transform.position);
+
+            if (_currentTile == null)
+            {
+                if ((_currentTile = Guess(coord)) == null)
+                {
+                    return;
+                }
+            }
 
             if (_currentTile.CanApply(coord))
             {

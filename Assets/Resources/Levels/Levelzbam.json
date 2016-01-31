@@ -42,7 +42,8 @@
     { "prefab": "Smite" },
     { "prefab": "Trap" },
     { "prefab": "Wall" },
-    { "prefab": "WallRemove" }
+    { "prefab": "WallRemove" },
+    { "prefab": "Reveal" }
   ],
   "tiles": [
     {

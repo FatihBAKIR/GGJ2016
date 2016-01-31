@@ -35,6 +35,9 @@ public class Trap : Agent
 
         if (explode)
         {
+            var p = Instantiate(Resources.Load<GameObject>("Particles/StunBlast"));
+            p.transform.position = Level.CurrentLevel.Grid.CoordAgentCenterPosition(Position);
+            Destroy(p, 1.2f);
             Debug.Log("boom");
             Level.CurrentLevel.Destroy(this);
         }

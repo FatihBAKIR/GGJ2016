@@ -193,6 +193,7 @@ public class TileWorks : MonoBehaviour
 
             case ChangeState.Ascending:
                 _ascended = true;
+                GetComponent<Collider>().enabled = true;
                 Level.CurrentLevel.Reveal(_tile.Coordinate);
                 _tilePromise.Fulfill();
                 _tilePromise = null;

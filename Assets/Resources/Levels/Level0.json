@@ -58,6 +58,9 @@
 		},
 		{
 			"prefab": "Smite"
+		},
+		{
+			"prefab": "Reveal"
 		}
 	],
 
@@ -183,7 +186,7 @@
 	"agents":
 	[
 		{
-			"coord": [0, 1],
+			"coord": [3, 0],
 			"prot": 2
 		},
 		{

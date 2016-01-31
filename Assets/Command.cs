@@ -203,7 +203,7 @@ sealed class SmiteCommand : TileCommand
 {
     public override int Range
     {
-        get { return 1; }
+        get { return 2; }
     }
 
     public override bool CanApply(Coord tile)

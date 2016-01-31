@@ -268,6 +268,7 @@ public class Level
                 var go = Object.Instantiate(tilePref, Grid.CoordToPosition(_grid.Get(j, i).Coordinate) + (_grid.Get(j, i).Elevation - 10) * Vector3.up, Quaternion.identity) as GameObject;
                 go.GetComponent<Renderer>().material = _grid.Get(j, i).Info.Material;
                 go.GetComponent<Renderer>().material.color = Color.black;
+                go.GetComponent<Collider>().enabled = false;
                 Grid.Get(j, i).Obj = go;
                 go.GetComponent<TileWorks>().SetState(Grid.Get(i, j), _canSee[i, j]);
             }
@@ -300,7 +301,7 @@ public class Level
 
     void ResolveSight()
     {
-        var tilesSeen = GetLoS(Object.FindObjectOfType<Player>().Position, 2);
+        var tilesSeen = GetLoS(Object.FindObjectOfType<Player>().Position, 4);
         foreach (var tile in tilesSeen)
         {
             if (tile == null)
@@ -425,7 +426,7 @@ public class Level
                 Grid.Get(i, j).Obj.GetComponent<TileWorks>().Descend();
                 Grid.Set(i, j, null);
 
-                yield return new WaitForSeconds(0.25f);
+                yield return new WaitForSeconds(0.10f);
             }
         }
     }
