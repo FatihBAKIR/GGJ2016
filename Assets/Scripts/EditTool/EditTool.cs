@@ -108,6 +108,7 @@ public class EditTool : MonoBehaviour
         _currentMat = materials[0];
         agentsPrefabs = Resources.LoadAll<GameObject>("Agents");
         _currentAgent = agentsPrefabs[0];
+        _tilePref.GetComponent<MeshFilter>().mesh = CubeGen.TileCube;
         levelInfo = new LevelLoader.LevelInfo();
         levelInfo.Meta = new LevelLoader.LevelInfo.LevelMeta() { Width = 16, Height = 16 };
         levelInfo.TileInfos = new LevelLoader.LevelInfo.TilePrefInfo[materials.Length];
@@ -128,6 +129,12 @@ public class EditTool : MonoBehaviour
         saveButton.onClick.AddListener(() => SaveFile(filenameInput.text));
         PopulateMaterials(materialParent);
         PopulateAgents(agentParent);
+
+        var rt = materialParent.GetComponent<RectTransform>();
+        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rt.sizeDelta.y * 2f);
+        rt = agentParent.GetComponent<RectTransform>();
+        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rt.sizeDelta.y * 2f);
+
         SetTileMode(true);
     }
 
