@@ -52,6 +52,9 @@
 		},
 		{
 			"prefab": "WallRemove"
+		},
+		{
+			"prefab": "Decoy"
 		}
 	],
 

@@ -125,12 +125,15 @@ sealed class WalkCommand : TileCommand
                Level.CurrentLevel.Get(tile).Info.CanWalk;
     }
 
+    private Promise _pr;
+
     protected override void DoApply(Coord tile)
     {
+        Level.CurrentLevel.AddPromise(_pr = new Promise());
+
         Source.GetComponent<MoveTowards>().MoveComplete += OnMoveComplete;
         Source.GetComponent<MoveTowards>().SetTarget(tile);
 
-        Debug.Log(GetDir(tile));
         switch (GetDir(tile))
         {
             case Dir.PosX:
@@ -155,5 +158,7 @@ sealed class WalkCommand : TileCommand
         Completed();
         Source.GetComponentInChildren<SkeletonAnimation>().AnimationName = "idle";
         Source.GetComponent<MoveTowards>().MoveComplete -= OnMoveComplete;
+        _pr.Fulfill();
+        _pr = null;
     }
 }

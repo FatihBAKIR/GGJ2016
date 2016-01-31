@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
 public class Tile
@@ -72,12 +75,17 @@ public class Grid
 
     public Vector3 CoordAgentCenterPosition(Coord crd)
     {
-        return CoordSurfacePosition(crd) + 0.5f*Vector3.up;
+        return CoordSurfacePosition(crd) + 0.5f * Vector3.up;
     }
 
     public void Set(Tile t)
     {
         _tiles[t.Coordinate.X, t.Coordinate.Y] = t;
+    }
+
+    public void Set(int x, int y, Tile t)
+    {
+        _tiles[x, y] = t;
     }
 
     public Tile Get(int x, int y)
@@ -133,13 +141,34 @@ public enum SeeState
     Revealed = 4
 }
 
+public class Promise
+{
+    public string From { get; private set; }
+
+    public Promise()
+    {
+        Fulfilled = false;
+        var stackTrace = new StackTrace();
+        var stackFrames = stackTrace.GetFrames();
+
+        From = stackFrames.Aggregate("", (s, frame) => s + " -> " + frame.GetMethod().Name);
+    }
+
+    public bool Fulfilled { get; private set; }
+
+    public void Fulfill()
+    {
+        Fulfilled = true;
+    }
+}
+
 public class Level
 {
-    public event Action SightResolveComplete = delegate { };
+    public event Action RoundFinished = delegate { };
     public event Action LevelLoaded = delegate { };
 
-    public event Action Failed = delegate { };
-    public event Action Success = delegate { }; 
+    public event Action Failed = delegate { Debug.Log("our guy just died because of you"); };
+    public event Action Success = delegate { Debug.Log("woohoooo"); };
 
     private readonly Grid _grid;
 
@@ -158,6 +187,7 @@ public class Level
     private readonly Dictionary<string, int> _agentMap;
 
     private readonly Func<Agent>[] _initializers;
+    private readonly List<Promise> _turnPromises;
 
     public Level(Grid g, AgentInfo[] agents, TileInfo[] tiles, Func<Agent>[] agentInitializers, Dictionary<string, int> agentMap)
     {
@@ -172,6 +202,7 @@ public class Level
 
         _agents = new List<Agent>();
         _canSee = new SeeState[Grid.Width, Grid.Height];
+        _turnPromises = new List<Promise>();
     }
 
     public Tile PlayerTile
@@ -213,12 +244,11 @@ public class Level
     {
         if (CurrentLevel != null)
         {
-            CurrentLevel.Clear();
             _level = null;
         }
         _level = this;
 
-        GameObject tilePref = Resources.Load<GameObject>("Tile"); 
+        GameObject tilePref = Resources.Load<GameObject>("Tile");
         tilePref.GetComponent<MeshFilter>().sharedMesh = CubeGen.TileCube;
 
         for (int i = 0; i < _grid.Height; i++)
@@ -229,12 +259,12 @@ public class Level
                 {
                     continue;
                 }
+
                 var go = Object.Instantiate(tilePref, Grid.CoordToPosition(_grid.Get(j, i).Coordinate) + (_grid.Get(j, i).Elevation - 10) * Vector3.up, Quaternion.identity) as GameObject;
                 go.GetComponent<Renderer>().material = _grid.Get(j, i).Info.Material;
                 go.GetComponent<Renderer>().material.color = Color.black;
                 Grid.Get(j, i).Obj = go;
                 go.GetComponent<TileWorks>().SetState(Grid.Get(i, j), _canSee[i, j]);
-                go.GetComponent<TileWorks>().StateChangeComplete += OnAscendComplete;
             }
         }
 
@@ -256,20 +286,7 @@ public class Level
         }
 
         LevelLoaded();
-    }
-
-    private int _waitingFor = 0;
-    private void OnAscendComplete(Tile tile)
-    {
-        if (--_waitingFor == 0)
-        {
-            SightResolveComplete();
-        }
-    }
-
-    public void Clear()
-    {
-
+        ResolveSight();
     }
 
     public void Destroy(Agent a)
@@ -278,7 +295,7 @@ public class Level
         _delete[_agents.IndexOf(a)] = true;
     }
 
-    public void ResolveSight()
+    void ResolveSight()
     {
         var tilesSeen = GetLoS(Object.FindObjectOfType<Player>().Position, 2);
         foreach (var tile in tilesSeen)
@@ -296,10 +313,7 @@ public class Level
                 if (Grid.Get(i, j) == null)
                     continue;
 
-                if (Grid.Get(i, j).Obj.GetComponent<TileWorks>().SetState(Grid.Get(i, j), _canSee[i, j]))
-                {
-                    _waitingFor++;                    
-                }
+                Grid.Get(i, j).Obj.GetComponent<TileWorks>().SetState(Grid.Get(i, j), _canSee[i, j]);
 
                 if (_canSee[i, j] > SeeState.Explored)
                 {
@@ -307,26 +321,56 @@ public class Level
                 }
             }
         }
+    }
 
-        if (_waitingFor == 0)
+    public void AddPromise(Promise p)
+    {
+        _turnPromises.Add(p);
+    }
+
+    public void Update()
+    {
+        bool allFulfilled = _turnPromises.Aggregate(true, (b, promise) => b && promise.Fulfilled);
+
+        if (allFulfilled)
         {
-            SightResolveComplete();
+            CheckConditions();
+            NextTurn();
+
+            if (_destroy)
+            {
+                Object.FindObjectOfType<Loader>().StartC(UnloadPart());
+            }
+        }
+
+        if (_destroy)
+        {
+            foreach (var source in _turnPromises.Where(promise => !promise.Fulfilled))
+            {
+                Debug.Log(source.From);
+            }
         }
     }
 
     bool[] _delete;
     public int TurnCount { get; private set; }
-    public void NextTurn()
+
+    void NextTurn()
     {
+        if (_destroy)
+        {
+            return;
+        }
+
         _delete = new bool[_agents.Count];
         TurnCount++;
+        Debug.Log("Turn: " + TurnCount);
 
-        Debug.Log("begin");
-        foreach (var agent in _agents)
+        _turnPromises.Clear();
+        for (int i = _agents.Count - 1; i >= 0; i--)
         {
-            agent.Step();
+            _agents[i].Step();
         }
-        Debug.Log("end");
 
         for (int i = _delete.Length - 1; i >= 0; i--)
         {
@@ -336,9 +380,51 @@ public class Level
                 _agents.RemoveAt(i);
             }
         }
+
+        ResolveSight();
+
+        if (!_destroy)
+        {
+            RoundFinished();
+        }
+    }
+
+    public void CheckConditions()
+    {
+        Debug.Log(PlayerTile.Coordinate);
+
+        if (PlayerTile.AgentsOnTile(agent => agent is Gate).Length > 0)
+        {
+            Success();
+            _destroy = true;
+        }
+    }
+
+    IEnumerator UnloadPart()
+    {
+        for (int j = 0; j < Grid.Height; j++)
+        {
+            for (int i = 0; i < Grid.Width; i++)
+            {
+                if (Grid.Get(i, j) == null)
+                    continue;
+
+                Grid.Get(i, j).Obj.GetComponent<TileWorks>().Descend();
+                Grid.Set(i, j, null);
+
+                yield return new WaitForSeconds(0.25f);
+            }
+        }
     }
 
     static Level _level;
+
+    private bool _destroy;
+    public void Fail()
+    {
+        _destroy = true;
+        Failed();
+    }
 
     public static Level CurrentLevel
     {
@@ -352,9 +438,10 @@ public class Level
 
     public Agent Instantiate(string name, Coord coord)
     {
-        //Debug.Log(coord + " -> " + Grid.CoordToPosition(coord));
         var go = Object.Instantiate(_initialAgents[AgentIdByName(name)].Prefab, _grid.CoordSurfacePosition(coord), Quaternion.identity) as GameObject;
         _agents.Add(go.GetComponent<Agent>());
+        go.GetComponent<Agent>().Position = coord;
+        go.GetComponent<Agent>().Init();
         return go.GetComponent<Agent>();
     }
 

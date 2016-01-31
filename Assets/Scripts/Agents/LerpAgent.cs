@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Linq;
+using Assets.Scripts.Agents;
 
 public class LerpAgent : Agent
 {
     public int Sight;
     readonly WalkCommand _cmd = new WalkCommand();
+
+    public Agent PreferedTarget;
 
     void Start()
     {
@@ -14,6 +16,11 @@ public class LerpAgent : Agent
 
     protected override void DoStep()
     {
+        if (Wait > 0)
+        {
+            return;
+        }
+
         var tiles = Level.CurrentLevel.Get(Position, _cmd.Range);
         var possible = tiles.Where(tile => _cmd.CanApply(tile.Coordinate)).ToArray();
 
@@ -22,15 +29,31 @@ public class LerpAgent : Agent
         var los = Level.CurrentLevel.GetLoS(Position, Sight);
 
         Coord? target = null;
-        foreach (var tile in los)
+        
+        if (PreferedTarget == null)
         {
-            if (tile == null) continue;
-            
-            if (tile.AgentsOnTile(agent => agent is Player).Length > 0)
+            foreach (var tile in los)
             {
-                target = tile.Coordinate;
-                break;
+                if (tile == null) continue;
+
+                if (tile.AgentsOnTile(agent => agent is Player).Length > 0)
+                {
+                    target = tile.Coordinate;
+                    break;
+                }
             }
+        }
+        else
+        {
+            var dist = Coord.Distance(PreferedTarget.Position, Position);
+            if (dist > 4)
+            {
+                PreferedTarget = null;
+                DoStep();
+                return;
+            }
+
+            target = PreferedTarget.Position;
         }
 
         if (target != null)
@@ -44,6 +67,20 @@ public class LerpAgent : Agent
 
                 nearest = tile;
                 dist = Coord.Distance(target.Value, tile.Coordinate);
+            }
+
+            if (Coord.Distance(target.Value, Position) <= 1.15f)
+            {
+                if (Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Player).Length > 0)
+                {
+                    Level.CurrentLevel.Fail();
+                }
+                else
+                {
+                    var decoy = Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Decoy).First();
+                    Level.CurrentLevel.Destroy(decoy);
+                }
+                return;
             }
 
             _cmd.Apply(nearest.Coordinate);

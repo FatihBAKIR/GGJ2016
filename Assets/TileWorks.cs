@@ -4,11 +4,10 @@ using System.Collections;
 
 public class TileWorks : MonoBehaviour
 {
-    public event Action<Tile> StateChangeComplete = delegate { };
-
     enum ChangeState
     {
         None,
+        Descending,
         Ascending,
         Shading,
         Lighting,
@@ -37,15 +36,15 @@ public class TileWorks : MonoBehaviour
         _ascended = false;
     }
 
-    public bool SetState(Tile t, SeeState st)
+    private Promise _tilePromise;
+
+    public void SetState(Tile t, SeeState st)
     {
         _tile = t;
-        bool ret = false;
 
         if (!_ascended && st > SeeState.Explored && _prev <= SeeState.Hidden)
         {
             Ascend();
-            ret = true;
         }
 
         if (st == SeeState.Explored && _prev > SeeState.Explored)
@@ -59,8 +58,19 @@ public class TileWorks : MonoBehaviour
         }
 
         _prev = st;
+    }
 
-        return ret;
+    public void Descend()
+    {
+        _state = ChangeState.Descending;
+        _t = 0;
+        _from = transform.position;
+        _to = transform.position - Vector3.up * 10;
+
+        _colorFrom = GetComponent<Renderer>().material.color;
+        _colorTo = Color.black;
+
+        Level.CurrentLevel.AddPromise(_tilePromise = new Promise());
     }
 
     void Ascend()
@@ -72,6 +82,8 @@ public class TileWorks : MonoBehaviour
 
         _colorFrom = GetComponent<Renderer>().material.color;
         _colorTo = Color.white;
+
+        Level.CurrentLevel.AddPromise(_tilePromise = new Promise());
     }
 
     void Shade()
@@ -151,6 +163,7 @@ public class TileWorks : MonoBehaviour
         {
             case ChangeState.None:
                 break;
+            case ChangeState.Descending:
             case ChangeState.Ascending:
                 transform.position = Vector3.Lerp(_from, _to, _t);
                 GetComponent<Renderer>().material.color = Color.Lerp(_colorFrom, _colorTo, _t);
@@ -173,10 +186,16 @@ public class TileWorks : MonoBehaviour
 
         switch (_state)
         {
+            case ChangeState.Descending:
+                _tilePromise.Fulfill();
+                _tilePromise = null;
+                break;
+
             case ChangeState.Ascending:
                 _ascended = true;
                 Level.CurrentLevel.Reveal(_tile.Coordinate);
-                StateChangeComplete(_tile);
+                _tilePromise.Fulfill();
+                _tilePromise = null;
                 break;
 
             case ChangeState.FadingIn:

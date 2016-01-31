@@ -30,6 +30,11 @@ public abstract class Agent : MonoBehaviour
         DoStep();
     }
 
+    public void Init()
+    {
+        DoStart();
+    }
+
     void Update()
     {
         bool active = Level.CurrentLevel.GetSeeState(Position) > (int) SeeState.Explored;
@@ -45,5 +50,6 @@ public abstract class Agent : MonoBehaviour
         }
     }
 
-    protected abstract void DoStep();
+    protected virtual void DoStart() { }
+    protected virtual void DoStep() { }
 }

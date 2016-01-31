@@ -1,30 +1,47 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Loader : MonoBehaviour
 {
+    public void StartC(IEnumerator generator)
+    {
+        StartCoroutine(generator);
+    }
+
     private Dictionary<KeyCode, Action> _keys;
 
     void Awake()
     {
         var level = LevelLoader.LoadLevel("Level0");
-        level.LevelLoaded += LevelOnLevelLoaded;
         level.LoadToScene();
+        LevelOnRoundFinished();
+        level.RoundFinished += LevelOnRoundFinished;
 
         _keys = new Dictionary<KeyCode, Action>
         {
             { KeyCode.A, SummonTrap },
             { KeyCode.M, MovePlayer },
+            { KeyCode.D, SummonDecoy },
         };
+
+        GameObject.Find("Spell1").GetComponent<Button>().onClick.AddListener(SummonTrap);
+        GameObject.Find("Spell2").GetComponent<Button>().onClick.AddListener(MovePlayer);
+        GameObject.Find("Spell3").GetComponent<Button>().onClick.AddListener(SummonDecoy);
+
+        _lastTrapTurn = -4;
     }
 
-    private void LevelOnLevelLoaded()
+    private void LevelOnRoundFinished()
     {
-        Level.CurrentLevel.SightResolveComplete += CurrentLevelOnSightResolveComplete;
-        Level.CurrentLevel.ResolveSight();
+        Level.CurrentLevel.AddPromise(_playerPromise = new Promise());
     }
+
+    private int _lastTrapTurn;
 
     private TileCommand _currentTile = null;
     private Tile[] _possibleTiles = null;
@@ -51,7 +68,6 @@ public class Loader : MonoBehaviour
 
             foreach (var tile in _possibleTiles)
             {
-                Debug.Log(tile.Coordinate);
                 Vector3 topCenter = Level.CurrentLevel.Grid.CoordSurfacePosition(tile.Coordinate);
                 Vector3 dir = Camera.main.transform.position - topCenter;
 
@@ -63,6 +79,7 @@ public class Loader : MonoBehaviour
                     {
                         continue;
                     }
+
                     Debug.Log(string.Format("Tile at {0} blocks movement to {1}", Grid.PositionToCoord(hit.transform.position), tile.Coordinate));
                     hit.transform.gameObject.GetComponent<TileWorks>().FadeOut();
                 }
@@ -74,8 +91,6 @@ public class Loader : MonoBehaviour
 
     private void CmdOnCommandComplete(Command command)
     {
-        Level.CurrentLevel.ResolveSight();
-
         if (command is WalkCommand)
         {
             foreach (var tile in FindObjectsOfType<TileWorks>())
@@ -83,28 +98,35 @@ public class Loader : MonoBehaviour
                 tile.FadeIn();
             }
         }
+
+        if (command is SpawnCommand && _isCmdTrap)
+        {
+            _lastTrapTurn = Level.CurrentLevel.TurnCount;
+        }
     }
 
-    private bool _first = true;
-    private void CurrentLevelOnSightResolveComplete()
+    private bool _isCmdTrap = false;
+    void SummonTrap()
     {
-        if (_first)
+        if (_lastTrapTurn + 4 > Level.CurrentLevel.TurnCount)
         {
-            _first = false;
+            Debug.Log("you can place one trap every 4 turns");
             return;
         }
 
-        Level.CurrentLevel.NextTurn();
-    }
-
-    void SummonTrap()
-    {
+        _isCmdTrap = true;
         SetCurrentTile(new SpawnCommand("Trap"));
     }
 
     void MovePlayer()
     {
         SetCurrentTile(new WalkCommand());
+    }
+
+    void SummonDecoy()
+    {
+        _isCmdTrap = false;
+        SetCurrentTile(new SpawnCommand("Decoy"));
     }
 
     void CheckTileClick()
@@ -123,10 +145,12 @@ public class Loader : MonoBehaviour
                 _currentTile.Apply(coord);
             }
 
+            _playerPromise.Fulfill();
             _currentTile = null;
         }
     }
 
+    private Promise _playerPromise;
     void Update()
     {
         CheckTileClick();
@@ -138,5 +162,7 @@ public class Loader : MonoBehaviour
                 action.Value();
             }
         }
+
+        Level.CurrentLevel.Update();
     }
 }
