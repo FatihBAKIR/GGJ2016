@@ -15,6 +15,9 @@ class LevelLoader
 
             [JsonProperty("height")]
             public int Height;
+
+            [JsonProperty("next")]
+            public string Next;
         }
 
         public class TilePrefInfo
@@ -123,6 +126,6 @@ class LevelLoader
             };
         }
 
-        return new Level(g, agents, tinfos, agentCreators, agentmap);
+        return new Level(g, agents, tinfos, agentCreators, agentmap) { NextLevel = info.Meta.Next };
     }
 }

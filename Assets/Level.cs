@@ -175,6 +175,11 @@ public class Level
     public event Action Failed = delegate { Debug.Log("our guy just died because of you"); };
     public event Action Success = delegate { Debug.Log("woohoooo"); };
 
+    public event Action Unloading = delegate { };
+    public event Action<Level> UnloadComplete = delegate { };
+
+    public bool IsLoaded { get; private set; }
+
     private readonly Grid _grid;
 
     private readonly SeeState[,] _canSee;
@@ -193,6 +198,8 @@ public class Level
 
     private readonly Func<Agent>[] _initializers;
     private readonly List<Promise> _turnPromises;
+
+    public string NextLevel { get; set; }
 
     public Level(Grid g, AgentInfo[] agents, TileInfo[] tiles, Func<Agent>[] agentInitializers, Dictionary<string, int> agentMap)
     {
@@ -294,9 +301,11 @@ public class Level
         Camera.main.GetComponent<CameraController>().target.position = _agents.Where((x) => x.name == "Player(Clone)").First().transform.position;
         Camera.main.GetComponent<CameraController>().targetOffset = Vector3.zero;
 
-
         LevelLoaded();
         ResolveSight();
+
+        UnloadComplete += delegate { UnloadLevel();  };
+        IsLoaded = true;
     }
 
     void ResolveSight()
@@ -374,7 +383,7 @@ public class Level
         for (int i = _agents.Count - 1; i >= 0; i--)
         {
             if (_delete[i]) continue;
-            
+
             _agents[i].Step();
         }
 
@@ -405,8 +414,6 @@ public class Level
 
     public void CheckConditions()
     {
-        Debug.Log(PlayerTile.Coordinate);
-
         if (PlayerTile.AgentsOnTile(agent => agent is Gate).Length > 0)
         {
             Success();
@@ -414,21 +421,44 @@ public class Level
         }
     }
 
+    void UnloadLevel()
+    {
+        foreach (var agent in _agents)
+        {
+            Object.Destroy(agent.gameObject);
+        }
+
+        for (int i = 0; i < Grid.Width; i++)
+        {
+            for (int j = 0; j < Grid.Height; j++)
+            {
+                if (Grid.Get(i, j) == null)
+                    continue;
+
+                Object.Destroy(Grid.Get(i, j).Obj);
+                Grid.Get(i, j).Obj = null;
+            }
+        }
+        _agents.Clear();
+    }
+
+
     IEnumerator UnloadPart()
     {
-        for (int j = 0; j < Grid.Height; j++)
+        for (int i = 0; i < Grid.Width; i++)
         {
-            for (int i = 0; i < Grid.Width; i++)
+            for (int j = 0; j < Grid.Height; j++)
             {
                 if (Grid.Get(i, j) == null)
                     continue;
 
                 Grid.Get(i, j).Obj.GetComponent<TileWorks>().Descend();
-                Grid.Set(i, j, null);
 
-                yield return new WaitForSeconds(0.10f);
+                yield return new WaitForSeconds(0.01f);
             }
         }
+
+        UnloadComplete(this);
     }
 
     static Level _level;
@@ -437,6 +467,7 @@ public class Level
     public void Fail()
     {
         _destroy = true;
+        IsLoaded = false;
         Failed();
     }
 

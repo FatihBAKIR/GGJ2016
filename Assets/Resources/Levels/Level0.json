@@ -2,7 +2,8 @@
 	"meta":
 	{
 		"width": 16,
-		"height": 16
+		"height": 16,
+		"next": "Leveltutorial"
 	},
 
 	"tileinfo":

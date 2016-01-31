@@ -1,7 +1,8 @@
 {
   "meta": {
     "width": 23,
-    "height": 23
+    "height": 23,
+	"next": "Levelzbam"
   },
   "tileinfo": [
     {

@@ -17,11 +17,6 @@ public class Loader : MonoBehaviour
 
     void Awake()
     {
-        var level = LevelLoader.LoadLevel("Levelzbam");
-        level.LoadToScene();
-        LevelOnRoundFinished();
-        level.RoundFinished += LevelOnRoundFinished;
-        
         _keys = new Dictionary<KeyCode, Action>
         {
             { KeyCode.A, SummonTrap },
@@ -37,7 +32,38 @@ public class Loader : MonoBehaviour
         GameObject.Find("Spell4").GetComponent<Button>().onClick.AddListener(Smite);
         GameObject.Find("Spell5").GetComponent<Button>().onClick.AddListener(Reveal);
 
+        GameObject.Find("Button0").GetComponent<Button>().onClick.AddListener(() => { LoadLevel("Level0"); Destroy(GameObject.Find("Button0")); });
+
         _lastTrapTurn = -4;
+    }
+
+    void LoadLevel(string name)
+    {
+        var level = LevelLoader.LoadLevel(name);
+        level.LoadToScene();
+        LevelOnRoundFinished();
+        level.RoundFinished += LevelOnRoundFinished;
+        level.Unloading += LevelUnloaded;
+        level.Success += LevelOnSuccess;
+        level.UnloadComplete += LevelOnUnloadComplete;
+    }
+
+    private void LevelOnUnloadComplete(Level level)
+    {
+        if (Level.CurrentLevel.NextLevel != null)
+        {
+            LoadLevel(level.NextLevel);
+        }
+    }
+
+    private void LevelOnSuccess()
+    {
+    }
+
+    void LevelUnloaded()
+    {
+        Level.CurrentLevel.RoundFinished -= LevelOnRoundFinished;
+        Level.CurrentLevel.Unloading -= LevelUnloaded;
     }
 
     void Reveal()
@@ -201,6 +227,11 @@ public class Loader : MonoBehaviour
     private Promise _playerPromise;
     void Update()
     {
+        if (Level.CurrentLevel == null || !Level.CurrentLevel.IsLoaded)
+        {
+            return;
+        }
+
         CheckTileClick();
 
         foreach (var action in _keys)

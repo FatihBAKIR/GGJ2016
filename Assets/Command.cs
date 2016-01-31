@@ -179,21 +179,23 @@ sealed class RitualCommand : TileCommand
     }
 
     private Promise _pr;
+    private Sigil _s;
 
     protected override void DoApply(Coord tile)
     {
         Level.CurrentLevel.AddPromise(_pr = new Promise());
 
         Debug.Log("ritual...");
-        var a = Level.CurrentLevel.Get(tile).AgentsOnTile(agent => agent is Sigil)[0];
-        ((Sigil)a).Activate();
-        ((Sigil)a).Activated += OnActivated;
+        _s = (Sigil)Level.CurrentLevel.Get(tile).AgentsOnTile(agent => agent is Sigil)[0];
+        _s.Activated += OnActivated;
+        _s.Activate();
         Source.GetComponentInChildren<SkeletonAnimation>().AnimationName = "ritual_1";
     }
 
     private void OnActivated(Sigil sigil)
     {
         Source.GetComponentInChildren<SkeletonAnimation>().AnimationName = "idle";
+        _s.Activated -= OnActivated;
         _pr.Fulfill();
         _pr = null;    
     }

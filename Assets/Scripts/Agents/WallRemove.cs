@@ -9,6 +9,12 @@ public class WallRemove : Sigil
 
     public override void Activate()
     {
+        if (_activated)
+        {
+            Completed();
+            return;
+        }
+
         _activated = true;
         _done = false;
         _t = 0;

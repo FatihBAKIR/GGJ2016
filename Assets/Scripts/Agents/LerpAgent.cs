@@ -84,8 +84,8 @@ public class LerpAgent : Agent
 
                 if (Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Decoy).Length > 0)
                 {
-                    var decoy = Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Decoy).FirstOrDefault();
-                    Level.CurrentLevel.Destroy(decoy);
+                    var decoy = Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Decoy).FirstOrDefault() as Decoy;
+                    decoy.Poof();
                 }
             }
 
