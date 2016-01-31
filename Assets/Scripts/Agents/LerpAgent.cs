@@ -16,6 +16,11 @@ public class LerpAgent : Agent
 
     protected override void DoStep()
     {
+        if (Wait == 1 && transform.FindChild("Stun") != null)
+        {
+            DestroyImmediate(transform.FindChild("Stun").gameObject);
+        }
+
         if (Wait > 0)
         {
             return;
@@ -29,7 +34,7 @@ public class LerpAgent : Agent
         var los = Level.CurrentLevel.GetLoS(Position, Sight);
 
         Coord? target = null;
-        
+
         if (PreferedTarget == null)
         {
             foreach (var tile in los)
@@ -76,8 +81,8 @@ public class LerpAgent : Agent
                     Level.CurrentLevel.Fail();
                     return;
                 }
-                
-                if(Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Decoy).Length > 0)
+
+                if (Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Decoy).Length > 0)
                 {
                     var decoy = Level.CurrentLevel.Get(target.Value).AgentsOnTile(agent => agent is Decoy).FirstOrDefault();
                     Level.CurrentLevel.Destroy(decoy);

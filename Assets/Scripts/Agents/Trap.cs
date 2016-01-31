@@ -3,6 +3,12 @@ using System.Collections;
 
 public class Trap : Agent
 {
+    private static GameObject _stun;
+    static Trap()
+    {
+        _stun = Resources.Load<GameObject>("Particles/Stun");
+    }
+
     public int Radius;
     int _startTime;
 
@@ -28,7 +34,10 @@ public class Trap : Agent
             foreach (var guy in guys)
             {
                 guy.Wait += 3;
-
+                var stun = Instantiate(_stun);
+                stun.name = "Stun";
+                stun.transform.parent = guy.transform;
+                stun.transform.localPosition = new Vector3(0, 1, 0);
                 explode = true;
             }
         }
