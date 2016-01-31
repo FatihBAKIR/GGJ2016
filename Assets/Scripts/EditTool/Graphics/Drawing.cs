@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using f16sbe.Graphics.Lines;
-using f16sbe.Utils.CameraUtils;
-using f16sbe.Utils;
 
 public static class DrawingInterface
 {

@@ -37,6 +37,11 @@ public class Tile
     {
         return Object.FindObjectsOfType<Agent>().Where(agent => (agent.Position == Coordinate && filter(agent))).ToArray();
     }
+
+    public void Elevate(float delta)
+    {
+        this.Elevation += delta;
+    }
 }
 
 public class Grid
@@ -284,6 +289,10 @@ public class Level
 
             _agents.Add(agent);
         }
+
+        Camera.main.GetComponent<CameraController>().target.position = _agents.Where((x) => x.name == "Player(Clone)").First().transform.position;
+        Camera.main.GetComponent<CameraController>().targetOffset = Vector3.zero;
+
 
         LevelLoaded();
         ResolveSight();

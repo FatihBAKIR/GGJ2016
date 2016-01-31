@@ -37,16 +37,23 @@ public abstract class Agent : MonoBehaviour
 
     void Update()
     {
-        bool active = Level.CurrentLevel.GetSeeState(Position) > (int) SeeState.Explored;
-
-        foreach (var rend in GetComponentsInChildren<Renderer>())
+        try
         {
-            rend.enabled = active;
+            bool active = Level.CurrentLevel.GetSeeState(Position) > (int)SeeState.Explored;
+
+            foreach (var rend in GetComponentsInChildren<Renderer>())
+            {
+                rend.enabled = active;
+            }
+
+            if (GetComponent<Renderer>() != null)
+            {
+                GetComponent<Renderer>().enabled = active;
+            }
         }
-
-        if (GetComponent<Renderer>() != null)
+        catch
         {
-            GetComponent<Renderer>().enabled = active;
+
         }
     }
 

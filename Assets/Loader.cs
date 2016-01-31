@@ -17,7 +17,7 @@ public class Loader : MonoBehaviour
 
     void Awake()
     {
-        var level = LevelLoader.LoadLevel("Level0");
+        var level = LevelLoader.LoadLevel("Levelqwer");
         level.LoadToScene();
         LevelOnRoundFinished();
         level.RoundFinished += LevelOnRoundFinished;

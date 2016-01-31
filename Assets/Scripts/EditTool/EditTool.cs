@@ -10,22 +10,37 @@ using System.IO;
 
 public class EditTool : MonoBehaviour
 {
+    class AgentData
+    {
+        public int prefId;
+        public int[] coords;
+        public GameObject obj;
+    }
+
     private LevelLoader.LevelInfo levelInfo;
     private Material[] materials;
     private GameObject[] agentsPrefabs;
 
     public GameObject materialParent;
+    public GameObject agentParent;
     public GameObject materialEntryPrefab;
+    public GameObject agentEntryPrefab;
     public GameObject materialText;
     public Button saveButton;
     public InputField filenameInput;
 
+    public GameObject tilesButton;
+    public GameObject agentsButton;
+
     private Material _currentMat;
+    private GameObject _currentAgent;
     private GameObject _tilePref;
+    private bool _tileMode = true;
 
     private List<Tile> _tiles = new List<Tile>();
     private List<GameObject> _tileObjects = new List<GameObject>();
-    private List<Agent> _agents = new List<Agent>();
+    private List<AgentData> _agents = new List<AgentData>();
+    private List<GameObject> _agentObjects = new List<GameObject>();
     private Dictionary<string, int> _tileInfoIDs = new Dictionary<string, int>();
     private Dictionary<string, int> _agentInfoIDs = new Dictionary<string, int>();
     // Use this for initialization
@@ -33,6 +48,15 @@ public class EditTool : MonoBehaviour
     void Awake()
     {
         _tilePref = Resources.Load<GameObject>("Tile");
+    }
+
+    public void SetTileMode(bool mode)
+    {
+        _tileMode = mode;
+        tilesButton.SetActive(!mode);
+        materialParent.transform.parent.parent.gameObject.SetActive(mode);
+        agentsButton.SetActive(mode);
+        agentParent.transform.parent.parent.gameObject.SetActive(!mode);
     }
 
     void CreateTile(Coord coordinates, Material material)
@@ -46,12 +70,44 @@ public class EditTool : MonoBehaviour
         _tiles.Add(tile);
     }
 
+    void CreateAgent(Coord coordinates, GameObject agent, float elevation)
+    {
+        var agentData = new AgentData() { coords = new int[] { coordinates.X, coordinates.Y }, prefId = _agentInfoIDs[agent.name] };
+        var go = Instantiate(agent, Grid.CoordToPosition(coordinates) + (1 + elevation) * Vector3.up, Quaternion.AngleAxis(45, Vector3.up)) as GameObject;
+        go.active = false;
+        foreach(var comp in go.GetComponents<Component>())
+        {
+            if(!comp is Renderer)
+            {
+                if (comp is MonoBehaviour)
+                {
+                    (comp as MonoBehaviour).enabled = false;
+                }
+            }
+        }
+        foreach(var comp in go.GetComponentsInChildren<Component>())
+        {
+            if(!comp is Renderer)
+            {
+                if (comp is MonoBehaviour)
+                {
+                    (comp as MonoBehaviour).enabled = false;
+                }
+            }
+        }
+        agentData.obj = go;
+
+        _agentObjects.Add(go);
+        _agents.Add(agentData);
+        go.active = true;
+    }
+
     void Start()
     {
         materials = Resources.LoadAll<Material>("Tiles");
         _currentMat = materials[0];
         agentsPrefabs = Resources.LoadAll<GameObject>("Agents");
-
+        _currentAgent = agentsPrefabs[0];
         levelInfo = new LevelLoader.LevelInfo();
         levelInfo.Meta = new LevelLoader.LevelInfo.LevelMeta() { Width = 16, Height = 16 };
         levelInfo.TileInfos = new LevelLoader.LevelInfo.TilePrefInfo[materials.Length];
@@ -71,6 +127,8 @@ public class EditTool : MonoBehaviour
 
         saveButton.onClick.AddListener(() => SaveFile(filenameInput.text));
         PopulateMaterials(materialParent);
+        PopulateAgents(agentParent);
+        SetTileMode(true);
     }
 
     void SaveFile(string filename)
@@ -94,15 +152,17 @@ public class EditTool : MonoBehaviour
             button.GetComponent<Button>().onClick.AddListener(() => SetMat(m));
         }
     }
-    public static string ReplaceLastOccurrence(string Source, string Find, string Replace)
+
+    void PopulateAgents(GameObject agentParent)
     {
-        int place = Source.LastIndexOf(Find);
-
-        if (place == -1)
-            return Source;
-
-        string result = Source.Remove(place, Find.Length).Insert(place, Replace);
-        return result;
+        foreach (var agent in agentsPrefabs)
+        {
+            var button = Instantiate(agentEntryPrefab) as GameObject;
+            button.transform.FindChild("Text").GetComponent<Text>().text = agent.name;
+            button.transform.SetParent(agentParent.transform);
+            var a = agent;
+            button.GetComponent<Button>().onClick.AddListener(() => SetAgent(a));
+        }
     }
 
     void UpdateLevelInfo()
@@ -135,8 +195,8 @@ public class EditTool : MonoBehaviour
             var a = _agents[i];
             levelInfo.Agents[i] = new LevelLoader.LevelInfo.AgentInstanceInfo()
             {
-                Coords = new int[] { a.Position.X + normX, a.Position.Y + normY},
-                PrefId = _agentInfoIDs[ReplaceLastOccurrence(a.name, "(Clone", "")]
+                Coords = new int[] { a.coords[0] + normX, a.coords[1] + normY },
+                PrefId = a.prefId
             };
         }
 
@@ -147,6 +207,12 @@ public class EditTool : MonoBehaviour
     {
         _currentMat = mat;
         materialText.GetComponent<Text>().text = mat.name;
+    }
+
+    void SetAgent(GameObject a)
+    {
+        _currentAgent = a;
+        materialText.GetComponent<Text>().text = a.name;
     }
     // Update is called once per frame
     void Update()
@@ -160,7 +226,11 @@ public class EditTool : MonoBehaviour
             point = Grid.CoordToPosition(coord) + Vector3.up * 0.5f;
 
             bool onTile = _tiles.Any((x) => x.Coordinate.X == coord.X && x.Coordinate.Y == coord.Y);
+            bool onAgent = _agents.Any((x) => x.coords[0] == coord.X && x.coords[1] == coord.Y);
+
             var select_tile = (onTile) ? _tiles.Where((x) => x.Coordinate.X == coord.X && x.Coordinate.Y == coord.Y).First() : null;
+            var select_agent = (onAgent) ? _agents.Where((x) => x.coords[0] == coord.X && x.coords[1] == coord.Y).First() : null;
+
             // Draw square line around the tile
             {
                 var frw = Vector3.forward * .5f;
@@ -170,19 +240,64 @@ public class EditTool : MonoBehaviour
                                                                     onTile ? Color.red : Color.yellow, -1, true);
             }
 
-            if (Input.GetMouseButton(0))
+            if (_tileMode)
             {
-                if (!onTile)
-                    CreateTile(coord, _currentMat);
+                if (Input.GetKey(KeyCode.LeftShift) && onTile)
+                {
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        select_tile.Elevate(0.1f);
+                        select_tile.Obj.transform.position += Vector3.up * 0.1f;
+                        if(select_agent != null) select_agent.obj.transform.position += Vector3.up * 0.1f;
+                    }
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        select_tile.Elevate(-0.1f);
+                        select_tile.Obj.transform.position -= Vector3.up * 0.1f;
+                        if(select_agent != null) select_agent.obj.transform.position -= Vector3.up * 0.1f;
+                    }
+                }
+                else
+                {
+                    if (Input.GetMouseButton(0))
+                    {
+                        if (!onTile)
+                            CreateTile(coord, _currentMat);
+                    }
+                    if (Input.GetMouseButton(1))
+                    {
+                        if (onTile)
+                        {
+                            _tileObjects.Remove(select_tile.Obj);
+                            Destroy(select_tile.Obj);
+                            _tiles.Remove(select_tile);
+                            select_tile = null;
+                        }
+                    }
+                }
             }
-            if (Input.GetMouseButton(1))
+            else
             {
                 if (onTile)
                 {
-                    _tileObjects.Remove(select_tile.Obj);
-                    Destroy(select_tile.Obj);
-                    _tiles.Remove(select_tile);
-                    select_tile = null;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        if(!onAgent)
+                        {
+                            CreateAgent(coord, _currentAgent, select_tile.Elevation);
+                        }
+
+                    }
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        if(onAgent)
+                        {
+                            _agentObjects.Remove(select_agent.obj);
+                            Destroy(select_agent.obj);
+                            _agents.Remove(select_agent);
+                            select_agent = null;
+                        }
+                    }
                 }
             }
         }
